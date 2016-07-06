@@ -11,6 +11,9 @@ organizationHomepage := Some(new URL("http://barbalion.com"))
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "latest.release" % "test" withSources() withJavadoc(),
-  "io.reactivex" %% "rxscala" % "latest.release" withSources() withJavadoc()
+//  "org.scaloid" %% "scaloid" % "latest.release" withSources() withJavadoc(),
+//  "io.reactivex" %% "rxscala" % "latest.release" withSources() withJavadoc(),
+  "org.scalatest" %% "scalatest" % "latest.release" % "test" withSources() withJavadoc()
 )
+
+isSnapshot := true

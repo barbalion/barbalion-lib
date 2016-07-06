@@ -1,6 +1,6 @@
-package com.barbalion.math.test
+package com.barbalion.lib.math.test
 
-import com.barbalion.math.Reactive
+import com.barbalion.lib.math.Reactive
 import org.scalatest.{FlatSpec, Matchers}
 
 class ReactiveSpec extends FlatSpec with Matchers {

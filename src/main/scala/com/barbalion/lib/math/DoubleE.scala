@@ -1,6 +1,6 @@
-package com.barbalion.math
+package com.barbalion.lib.math
 
-import com.barbalion.math.DoubleE.NaN
+import com.barbalion.lib.math.DoubleE.NaN
 
 import scala.language.implicitConversions
 
@@ -29,19 +29,17 @@ class DoubleE(
   // value with zero error
   def exact = newResultValue(value, 0, generation)
 
-  private def withValueOf(value: DoubleE)(m: => DoubleE): DoubleE = value match {
-    case NaN => NaN
-    case _ => m
-  }
-
-  protected def newResultValue(value: Double, err2: Double, generation: Long) = new DoubleE(value, err2, generation)
+  override def plus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
+    x.value + y.value, x.err2 + y.err2, x.combineGen(y))
 
   protected def newResultValueWithY(y: DoubleE)(value: Double, err2: Double, generation: Long) = withValueOf(y) {
     new DoubleE(value, err2, generation)
   }
 
-  override def plus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
-    x.value + y.value, x.err2 + y.err2, x.combineGen(y))
+  private def withValueOf(value: DoubleE)(m: => DoubleE): DoubleE = value match {
+    case NaN => NaN
+    case _ => m
+  }
 
   override def minus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
     x.value - y.value, x.err2 + y.err2, x.combineGen(y))
@@ -55,21 +53,23 @@ class DoubleE(
     if (y.value == 0) NaN else newResultValue(x.value / y.value, (x.err2 * y.value2 + y.err2 * x.value2) / y.value4, x.combineGen(y))
   }
 
+  def +(a: Int): DoubleE = this + a.toDouble
+
   def +(a: Double) = newResultValue(value + a, err2, generation)
 
-  def -(a: Double) = newResultValue(value - a, err2, generation)
-
-  def *(a: Double) = newResultValue(value * a, err2 * (a * a), generation)
-
-  def /(a: Double) = if (a == 0) NaN else newResultValue(value / a, err2 / (a * a), generation)
-
-  def +(a: Int): DoubleE = this + a.toDouble
+  protected def newResultValue(value: Double, err2: Double, generation: Long) = new DoubleE(value, err2, generation)
 
   def -(a: Int): DoubleE = this - a.toDouble
 
+  def -(a: Double) = newResultValue(value - a, err2, generation)
+
   def *(a: Int): DoubleE = this * a.toDouble
 
+  def *(a: Double) = newResultValue(value * a, err2 * (a * a), generation)
+
   def /(a: Int): DoubleE = this / a.toDouble
+
+  def /(a: Double) = if (a == 0) NaN else newResultValue(value / a, err2 / (a * a), generation)
 
   def sqr = newResultValue(value2, 4 * err2 * value2, generation)
 
@@ -80,10 +80,10 @@ class DoubleE(
 
   def !=(a: DoubleE) = value != a.value
 
+  def !==(a: DoubleE) = !(this === a)
+
   // check if both the values and the errors matches
   def ===(a: DoubleE) = value == a.value && err2 == a.err2
-
-  def !==(a: DoubleE) = !(this === a)
 
   override def toString: String = if (err == 0) value.toString else value.toString + "+-" + err.toString
 
@@ -131,6 +131,8 @@ object DoubleE {
     Err(meanError2) + exactMean
   }
 
+  implicit def fromInt(a: Int): DoubleE = fromDouble(a)
+
   implicit def fromDouble(a: Double): DoubleE = a match {
     case 0.0 => Zero
     case 1.0 => One
@@ -140,7 +142,7 @@ object DoubleE {
     case _ => new DoubleE(a, 0, 0)
   }
 
-  implicit def fromInt(a: Int): DoubleE = fromDouble(a)
+  implicit def infixFractionalOps(x: DoubleE): DoubleE#FractionalOps = new x.FractionalOps(x)
 
   object Zero extends DoubleE(0, 0, 0)
 
@@ -155,17 +157,15 @@ object DoubleE {
   /* here comes NaN implementation */
   object NaN extends DoubleE(Double.NaN, Double.NaN, 0) {
 
-    override protected def newResultValue(value: Double, err2: Double, generation: Long): DoubleE = this
-
     override def toString: String = "NaN"
+
+    override protected def newResultValue(value: Double, err2: Double, generation: Long): DoubleE = this
 
   }
 
   object Err {
     def apply(err2: Double) = new DoubleE(0, err2, 0)
   }
-
-  implicit def infixFractionalOps(x: DoubleE): DoubleE#FractionalOps = new x.FractionalOps(x)
 
 }
 

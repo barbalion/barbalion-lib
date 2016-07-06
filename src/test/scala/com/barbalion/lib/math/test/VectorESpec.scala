@@ -1,4 +1,4 @@
-package com.barbalion.math.test
+package com.barbalion.lib.math.test
 
 import org.scalatest.FlatSpec
 

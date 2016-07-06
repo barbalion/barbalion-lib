@@ -1,4 +1,4 @@
-package com.barbalion.math
+package com.barbalion.lib.math
 
 /**
   * Created by barbalion on 15.02.2016.

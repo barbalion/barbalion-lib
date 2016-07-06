@@ -1,9 +1,9 @@
-package com.barbalion.math
+package com.barbalion.lib.math
 
 import scala.collection.mutable
 
 /**
-  * Trait that can produce changes and notify [[com.barbalion.math.Consumer Consumer]]s.
+  * Trait that can produce changes and notify [[com.barbalion.lib.math.Consumer Consumer]]s.
   * Typically a cell is a producer for other cells.
   */
 trait Producer[T] {
@@ -43,14 +43,14 @@ trait Producer[T] {
 
 }
 
-/** Trait that can consume changes (subscribe) for reactive changes of [[com.barbalion.math.Producer Producer]]s.
+/** Trait that can consume changes (subscribe) for reactive changes of [[com.barbalion.lib.math.Producer Producer]]s.
   * Typically a cell is a consumer of other cells.
   */
 trait Consumer {
   /** List of Producers */
   private val producers = new mutable.HashSet[Producer[_]]
 
-  /** Consume (subscribe) the values of the [[com.barbalion.math.Producer Producer]]s
+  /** Consume (subscribe) the values of the [[com.barbalion.lib.math.Producer Producer]]s
     *
     * @param ps producers to subscribe
     */
@@ -70,13 +70,13 @@ trait Consumer {
   protected[math] def notify(p: Producer[_])
 }
 
-/** Reactive Cell implementation. It can store one [[com.barbalion.math.Reactive#value() value]] of type <code>T</code>.
+/** Reactive Cell implementation. It can store one [[com.barbalion.lib.math.Reactive#value() value]] of type <code>T</code>.
   * The value can be dependant of other cells.
-  * Use [[com.barbalion.math.Reactive$ Reactive]] object to create new instances of the cells.
+  * Use [[com.barbalion.lib.math.Reactive$ Reactive]] object to create new instances of the cells.
   * Assign new values (constant or reactive) to <code>value</code> property.
   *
   * @tparam T the type of cell's value
-  * @see [[com.barbalion.math.Reactive#value value]] property
+  * @see [[com.barbalion.lib.math.Reactive#value value]] property
   */
 abstract class Reactive[T] extends Producer[T] with Consumer {
   /** Cached last known value */
@@ -111,7 +111,7 @@ abstract class Reactive[T] extends Producer[T] with Consumer {
 
   /** Set reactive value to the cell. It will automatically re-calculate if producer (i.e. other cells) changes.
     *
-    * @param v a [[scala.Tuple2 Tuple2]] object with list of [[com.barbalion.math.Producer producers]] and the calculation function.
+    * @param v a [[scala.Tuple2 Tuple2]] object with list of [[com.barbalion.lib.math.Producer producers]] and the calculation function.
     *          Use syntax sugar to create to Tuple2.
     * @tparam V the type of producers
     */
@@ -166,12 +166,12 @@ abstract class Reactive[T] extends Producer[T] with Consumer {
 
 }
 
-/** Implicit conversions and syntax sugar object for [[com.barbalion.math.Reactive Reactive]] class.
-  * Use [[com.barbalion.math.Reactive#apply(scala.Function1) apply]] to spawn new Reactive[T] objects. */
+/** Implicit conversions and syntax sugar object for [[com.barbalion.lib.math.Reactive Reactive]] class.
+  * Use [[com.b arbalion.lib.math.Reactive#apply(scala.Function1) apply]] to spawn new Reactive[T] objects. */
 //noinspection LanguageFeature
 object Reactive {
   /**
-    * Creates [[com.barbalion.math.Reactive Reactive]] cell object with specified initial value.
+    * Creates [[com.barbalion.lib.math.Reactive Reactive]] cell object with specified initial value.
     * @param v init value of the cell
     * @tparam T type of the value
     * @return new instance of Reactive object
@@ -181,8 +181,8 @@ object Reactive {
   }
 
   /**
-    * Creates [[com.barbalion.math.Reactive Reactive]] cell object with specified initial dependency.
-    * @param producers list of source value [[com.barbalion.math.Producer Producer]]s
+    * Creates [[com.barbalion.lib.math.Reactive Reactive]] cell object with specified initial dependency.
+    * @param producers list of source value [[com.barbalion.lib.math.Producer Producer]]s
     * @param fun value calculation function
     * @tparam T type of the result value
     * @tparam V type of source values

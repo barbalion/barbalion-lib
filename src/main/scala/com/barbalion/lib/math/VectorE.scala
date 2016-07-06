@@ -1,6 +1,5 @@
-package com.barbalion.math
-
-import com.barbalion.math.DoubleE.Zero
+package com.barbalion.lib.math
+import com.barbalion.lib.math.DoubleE.Zero
 
 /**
   * Immutable vectors with Error
