@@ -167,7 +167,7 @@ abstract class Reactive[T] extends Producer[T] with Consumer {
 }
 
 /** Implicit conversions and syntax sugar object for [[com.barbalion.lib.math.Reactive Reactive]] class.
-  * Use [[com.b arbalion.lib.math.Reactive#apply(scala.Function1) apply]] to spawn new Reactive[T] objects. */
+  * Use [[com.barbalion.lib.math.Reactive#apply(scala.Function1) apply]] to spawn new Reactive[T] objects. */
 //noinspection LanguageFeature
 object Reactive {
   /**
