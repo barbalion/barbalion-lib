@@ -9,14 +9,12 @@ import scala.language.implicitConversions
   * All operations calculates Error as a co-product
   * Each value also has
   */
-class DoubleE(
+case class DoubleE(
                // value
-               val value: Double,
+               value: Double,
                // squared error
-               val err2: Double,
-               // measure generation
-               val generation: Long
-             ) extends Numeric[DoubleE] with Fractional[DoubleE] with Ordered[DoubleE] with Aged {
+               err2: Double
+             ) extends Numeric[DoubleE] with Fractional[DoubleE] with Ordered[DoubleE] {
   // error
   lazy val err = Math.sqrt(err2)
 
@@ -27,13 +25,13 @@ class DoubleE(
   lazy val value4 = value2 * value2
 
   // value with zero error
-  def exact = newResultValue(value, 0, generation)
+  def exact = newResultValue(value, 0)
 
   override def plus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
-    x.value + y.value, x.err2 + y.err2, x.combineGen(y))
+    x.value + y.value, x.err2 + y.err2)
 
-  protected def newResultValueWithY(y: DoubleE)(value: Double, err2: Double, generation: Long) = withValueOf(y) {
-    new DoubleE(value, err2, generation)
+  protected def newResultValueWithY(y: DoubleE)(value: Double, err2: Double) = withValueOf(y) {
+    new DoubleE(value, err2)
   }
 
   private def withValueOf(value: DoubleE)(m: => DoubleE): DoubleE = value match {
@@ -42,38 +40,43 @@ class DoubleE(
   }
 
   override def minus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
-    x.value - y.value, x.err2 + y.err2, x.combineGen(y))
+    x.value - y.value, x.err2 + y.err2)
 
   override def times(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
-    x.value * y.value, x.err2 * y.value2 + y.err2 * x.value2, x.combineGen(y))
+    x.value * y.value, x.err2 * y.value2 + y.err2 * x.value2)
 
-  override def fromInt(x: Int): DoubleE = newResultValue(x, 0, 0)
+  override def fromInt(x: Int): DoubleE = newResultValue(x, 0)
 
   override def div(x: DoubleE, y: DoubleE): DoubleE = withValueOf(y) {
-    if (y.value == 0) NaN else newResultValue(x.value / y.value, (x.err2 * y.value2 + y.err2 * x.value2) / y.value4, x.combineGen(y))
+    if (y.value == 0) NaN else newResultValue(x.value / y.value, (x.err2 * y.value2 + y.err2 * x.value2) / y.value4)
   }
 
   def +(a: Int): DoubleE = this + a.toDouble
 
-  def +(a: Double) = newResultValue(value + a, err2, generation)
+  def +(a: Double) = newResultValue(value + a, err2)
 
-  protected def newResultValue(value: Double, err2: Double, generation: Long) = new DoubleE(value, err2, generation)
+  protected def newResultValue(value: Double, err2: Double) = new DoubleE(value, err2)
 
   def -(a: Int): DoubleE = this - a.toDouble
 
-  def -(a: Double) = newResultValue(value - a, err2, generation)
+  def -(a: Double) = newResultValue(value - a, err2)
 
   def *(a: Int): DoubleE = this * a.toDouble
 
-  def *(a: Double) = newResultValue(value * a, err2 * (a * a), generation)
+  def *(a: Double) = newResultValue(value * a, err2 * (a * a))
 
   def /(a: Int): DoubleE = this / a.toDouble
 
-  def /(a: Double) = if (a == 0) NaN else newResultValue(value / a, err2 / (a * a), generation)
+  def /(a: Double) = if (a == 0) NaN else newResultValue(value / a, err2 / (a * a))
 
-  def sqr = newResultValue(value2, 4 * err2 * value2, generation)
+  def sqr = newResultValue(value2, 4 * err2 * value2)
 
-  def sqrt = if (value < 0) NaN else newResultValue(Math.sqrt(value), if (value == 0) err2 / 4 else err2 / (4 * value), generation)
+  def sqrt = if (value < 0) NaN else newResultValue(Math.sqrt(value), if (value == 0) err2 / 4 else err2 / (4 * value))
+
+  def exp = {
+    val e: Double = math.exp(value)
+    newResultValue(e, err2 * e * e)
+  }
 
   // check if values match and ignore the errors
   def ==(a: DoubleE) = value == a.value
@@ -95,7 +98,7 @@ class DoubleE(
 
   override def toDouble(x: DoubleE): Double = value.toDouble
 
-  override def negate(x: DoubleE): DoubleE = newResultValue(-value, err2, generation)
+  override def negate(x: DoubleE): DoubleE = newResultValue(-value, err2)
 
   override def equals(o: scala.Any): Boolean = o match {
     case a: DoubleE => value.equals(a.value) && err2.equals(a.err2)
@@ -111,9 +114,7 @@ class DoubleE(
 }
 
 object DoubleE {
-  def apply(value: Double, err2: Double, generation: Long) = new DoubleE(value, err2, generation)
-
-  def weightedMean(values: List[DoubleE]) = {
+  def weightedMean(values: Seq[DoubleE]) = {
     values.filter(_.err2 == 0) match {
       case Nil => // weighted mean
         val x = values.map(x => x / x.err).sum(Zero)
@@ -124,7 +125,7 @@ object DoubleE {
     }
   }
 
-  def mean(values: List[DoubleE]) = {
+  def mean(values: Seq[DoubleE]) = {
     def sqr(x: Double) = x * x
     val exactMean = values.map(_.value).sum / values.length
     val meanError2 = values.map(x => sqr(x.value - exactMean.value)).sum / values.length
@@ -139,32 +140,32 @@ object DoubleE {
     case 2.0 => Two
     case 3.0 => Three
     case 4.0 => Four
-    case _ => new DoubleE(a, 0, 0)
+    case _ => new DoubleE(a, 0)
   }
 
   implicit def infixFractionalOps(x: DoubleE): DoubleE#FractionalOps = new x.FractionalOps(x)
 
-  object Zero extends DoubleE(0, 0, 0)
+  object Zero extends DoubleE(0, 0)
 
-  object One extends DoubleE(1, 0, 0)
+  object One extends DoubleE(1, 0)
 
-  object Two extends DoubleE(2, 0, 0)
+  object Two extends DoubleE(2, 0)
 
-  object Three extends DoubleE(3, 0, 0)
+  object Three extends DoubleE(3, 0)
 
-  object Four extends DoubleE(4, 0, 0)
+  object Four extends DoubleE(4, 0)
 
   /* here comes NaN implementation */
-  object NaN extends DoubleE(Double.NaN, Double.NaN, 0) {
+  object NaN extends DoubleE(Double.NaN, Double.NaN) {
 
     override def toString: String = "NaN"
 
-    override protected def newResultValue(value: Double, err2: Double, generation: Long): DoubleE = this
+    override protected def newResultValue(value: Double, err2: Double): DoubleE = this
 
   }
 
   object Err {
-    def apply(err2: Double) = new DoubleE(0, err2, 0)
+    def apply(err2: Double) = new DoubleE(0, err2)
   }
 
 }

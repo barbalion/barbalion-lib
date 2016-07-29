@@ -7,24 +7,24 @@ import org.scalatest.Matchers._
 
 class DoubleESpec extends FlatSpec {
   {
-    Zero.value == 0 && Zero.err == 0 && Zero == new DoubleE(0, 0, 0) should be(true)
+    Zero.value == 0 && Zero.err == 0 && Zero == new DoubleE(0, 0) should be(true)
 
-    One.value == 1 && One.err == 0 && One == new DoubleE(1, 0, 0) should be(true)
+    One.value == 1 && One.err == 0 && One == new DoubleE(1, 0) should be(true)
 
-    Zero != DoubleE(1, 0, 0) shouldBe true
+    Zero != DoubleE(1, 0) shouldBe true
 
     One + Two === Three shouldBe true
 
     Two * Two === Four shouldBe true
     Two * 2 === Four shouldBe true
 
-    val x = DoubleE(1.5, 4, 0)
-    val y = DoubleE(2.5, 9, 0)
+    val x = DoubleE(1.5, 4)
+    val y = DoubleE(2.5, 9)
     val list = List(
-      DoubleE(1, 1, 0),
-      DoubleE(2, 1, 0),
-      DoubleE(3, 1, 0),
-      DoubleE(4, 1, 0))
+      DoubleE(1, 1),
+      DoubleE(2, 1),
+      DoubleE(3, 1),
+      DoubleE(4, 1))
 
     x.err shouldBe 2
     x.err2 shouldBe 4
