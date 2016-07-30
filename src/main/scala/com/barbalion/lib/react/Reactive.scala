@@ -6,18 +6,28 @@ package com.barbalion.lib.react
   * Assign new values (constant or reactive) to <code>value</code> property.
   *
   * @tparam T the type of cell's value
+  * @param calculator [[com.barbalion.lib.react.Calculator Calculator]] to run calculations
   * @see [[Reactive#value value]] property
   */
 abstract class Reactive[T](implicit calculator: Calculator) extends Producer[T] with Consumer {
   /**
+    * Constructor to subscribe to the Producers
+    * @param ps list of producers to subscribe for
+    * @param calculator [[com.barbalion.lib.react.Calculator Calculator]] to run calculations
+    */
+  def this(ps: Seq[Producer[_]])(implicit calculator: Calculator) = {
+    this()(calculator)
+    consume(ps)
+  }
+
+  /**
     * Cached last known value
     */
-
-  protected var lastValue: T = initValue
+  protected var lastValue: T = default
   /**
     * The variable function that will calculate the result for us
     */
-  protected var calc: () => T = () => initValue
+  protected var calc: () => T = () => default
 
   /** Set constant value to the cell
     * No any trigger will affect this constant value.
@@ -97,8 +107,9 @@ abstract class Reactive[T](implicit calculator: Calculator) extends Producer[T] 
 
   override protected[react] def notify(p: Producer[_]): Unit = calculator.reCalc(this)
 
-  /** Initial value of the <code>Reactive</code> cell */
-  protected def initValue: T
+  /** Initial default value of the <code>Reactive</code> cell.
+    * If another value wasn't set to the cell then default will be re-calculated each time cell receives notification from [[com.barbalion.lib.react.Producer Producers]] */
+  protected def default: T
 
 }
 
@@ -114,7 +125,7 @@ object Reactive {
     * @return new instance of Reactive object
     */
   def apply[T](v: T)(implicit calculator: Calculator) = new Reactive[T]()(calculator) {
-    override protected def initValue: T = v
+    override protected def default: T = v
   }
 
   /**
@@ -127,7 +138,7 @@ object Reactive {
     * @return new instance of Reactive object calculated from sources.
     */
   def apply[T, V](producers: Seq[Reactive[V]], fun: Seq[V] => T)(implicit calculator: Calculator) = new Reactive[T]()(calculator) {
-    override protected def initValue: T = fun(producers map (_.value))
+    override protected def default: T = fun(producers map (_.value))
 
     value = (producers, fun)
   }

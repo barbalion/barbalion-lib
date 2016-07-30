@@ -1,4 +1,5 @@
 package com.barbalion.lib.math
+
 import com.barbalion.lib.math.DoubleE.Zero
 
 /**
@@ -30,7 +31,10 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
     case _ => throw new Exception("Bad vector.")
   }
 
+  def posE = (x, y)
+
   def pos = (x.value, y.value)
+
   def posFloat = (x.value.toFloat, y.value.toFloat)
 }
 
@@ -41,6 +45,7 @@ case class Vector3E(x: DoubleE, y: DoubleE, z: DoubleE) extends VectorE(List(x, 
   }
 
   def pos = (x, y, z)
+
   def posFloat = (x.value.toFloat, y.value.toFloat, z.value.toFloat)
 }
 
