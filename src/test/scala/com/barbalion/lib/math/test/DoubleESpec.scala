@@ -44,7 +44,12 @@ class DoubleESpec extends FlatSpec {
     withClue("weightedMean") {
       val e: DoubleE = weightedMean(list)
       e.value should be(2.5)
-      e.err2 should be(1.5)
+      e.err2 should be(0.25)
+
+      val v1 = DoubleE(1, 0.1 * 0.1)
+      val v2 = DoubleE(2, 1)
+      val m1: DoubleE = weightedMean(v1 :: v2 :: Nil)
+      m1.err should be < v1.err
     }
 
     withClue("Constant cache") {

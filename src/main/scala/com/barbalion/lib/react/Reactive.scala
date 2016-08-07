@@ -1,4 +1,5 @@
 package com.barbalion.lib.react
+import scala.collection.mutable
 
 /** Reactive Cell implementation. It can store one [[Reactive#value() value]] of type <code>T</code>.
   * The value can be dependant of other cells.
@@ -9,13 +10,13 @@ package com.barbalion.lib.react
   * @param calculator [[com.barbalion.lib.react.Calculator Calculator]] to run calculations
   * @see [[Reactive#value value]] property
   */
-abstract class Reactive[T](implicit calculator: Calculator) extends Producer[T] with Consumer {
+abstract class Reactive[T](implicit val calculator: Calculator) extends Producer[T] with Consumer {
   /**
     * Constructor to subscribe to the Producers
     * @param ps list of producers to subscribe for
     * @param calculator [[com.barbalion.lib.react.Calculator Calculator]] to run calculations
     */
-  def this(ps: Seq[Producer[_]])(implicit calculator: Calculator) = {
+  def this(ps: Producer[_]*)(implicit calculator: Calculator) = {
     this()(calculator)
     consume(ps)
   }
@@ -36,6 +37,12 @@ abstract class Reactive[T](implicit calculator: Calculator) extends Producer[T] 
     */
   def value_=(v: T) = {
     calc = () => v
+    unConsumeAll()
+    calculator.calc(this)
+  }
+
+  def value_=(v: () => T) = {
+    calc = v
     unConsumeAll()
     calculator.calc(this)
   }
@@ -105,12 +112,21 @@ abstract class Reactive[T](implicit calculator: Calculator) extends Producer[T] 
     */
   @inline def unbind() = value = lastValue
 
-  override protected[react] def notify(p: Producer[_]): Unit = calculator.reCalc(this)
+  override protected[react] def producerChanged(p: Producer[_]): Unit = calculator.reCalc(this)
+
+  override protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]): Unit = {
+    val cons = consumers groupBy (_.isInstanceOf[Reactive[_]])
+    // calc reactive consumers as list
+    calculator.reCalc(cons.getOrElse(true, Nil) map (_.asInstanceOf[Reactive[_]]))
+    // notify other consumers
+    cons.getOrElse(false, Nil) foreach(_.producerChanged(this))
+  }
 
   /** Initial default value of the <code>Reactive</code> cell.
     * If another value wasn't set to the cell then default will be re-calculated each time cell receives notification from [[com.barbalion.lib.react.Producer Producers]] */
   protected def default: T
 
+  override def toString: String = value.toString
 }
 
 /** Implicit conversions and syntax sugar object for [[Reactive Reactive]] class.

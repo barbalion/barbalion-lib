@@ -3,26 +3,30 @@ package com.barbalion.lib.react
 import scala.collection.mutable
 
 /**
-  * Smart calculator to process circular dependencies (with some overhead).
+  * Smart calculator to process circular dependencies (with some overhead and synchronization).
   */
 class SmartCalculator extends Calculator {
-  private val calcStack = mutable.Set[Reactive[_]]()
-  private var queue = mutable.Set[Reactive[_]]()
+  protected val calcStack = mutable.Set[Reactive[_]]()
+  protected val queue = mutable.Set[Reactive[_]]()
 
-  override def calc(r: Reactive[_]): Unit = {
-    calcStack.clear()
+  override def calc(r: Reactive[_]): Unit = synchronized {
     reCalc(r)
   }
 
-  override def reCalc(r: Reactive[_]): Unit = {
+  override def reCalc(r: Reactive[_]): Unit = synchronized {
     if (calcStack.contains(r)) {
       queue += r
     } else {
       calcStack += r
-      r.doCalc()
-      calcStack -= r
+      try {
+        r.doCalc()
+      } finally {
+        calcStack -= r
+      }
     }
   }
+
+  override def reCalc(rs: TraversableOnce[Reactive[_]]): Unit = rs foreach reCalc
 
   /**
     * Check if the calculation was completed (no circular dependencies found).
@@ -34,20 +38,21 @@ class SmartCalculator extends Calculator {
   /**
     * Continues calculation if it wasn't [[done]].
     *
-    * @return true if some calculation was performed
+    * @return number of value recalculated
     */
-  def continue(): Boolean = {
+  def continue(): Int = synchronized {
     if (queue.nonEmpty) {
-      calcStack.clear()
-      val oldQueue = queue
-      queue = mutable.Set[Reactive[_]]()
-      oldQueue foreach reCalc
-      true
+      queue.clone() foreach (r => {
+        queue -= r
+        reCalc(r)
+      })
+      queue.size
     } else
-      false
+      0
   }
+
+  def clearQueue() = synchronized { queue.clear() }
+
 }
 
-object SmartCalculator extends SmartCalculator {
-  implicit val calculator = this
-}
+object SmartCalculator extends SmartCalculator

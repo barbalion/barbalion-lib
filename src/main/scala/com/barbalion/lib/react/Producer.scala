@@ -39,6 +39,8 @@ trait Producer[T] {
   /**
     * Notify previously subscribed consumers
     */
-  protected[react] def notifyConsumers() = consumers.foreach(_.notify(this))
+  protected[react] final def notifyConsumers() = doNotifyConsumers(consumers)
+
+  protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]) = consumers.foreach(_.producerChanged(this))
 
 }

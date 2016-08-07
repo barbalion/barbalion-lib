@@ -3,6 +3,7 @@ package com.barbalion.lib.math
 import com.barbalion.lib.math.DoubleE.NaN
 
 import scala.language.implicitConversions
+import scala.util.Random
 
 /**
   * Error-based calculations
@@ -10,22 +11,25 @@ import scala.language.implicitConversions
   * Each value also has
   */
 case class DoubleE(
-               // value
-               value: Double,
-               // squared error
-               err2: Double
-             ) extends Numeric[DoubleE] with Fractional[DoubleE] with Ordered[DoubleE] {
-  // error
+                    // value
+                    value: Double,
+                    // squared error
+                    err2: Double
+                  ) extends Numeric[DoubleE] with Fractional[DoubleE] with Ordered[DoubleE] {
+  /** error */
   lazy val err = Math.sqrt(err2)
 
-  // squared value
+  /** squared value */
   lazy val value2 = value * value
 
-  // double-squared value
+  /** double-squared value */
   lazy val value4 = value2 * value2
 
-  // value with zero error
+  /** value with zero error */
   def exact = newResultValue(value, 0)
+
+  /** return the value with random error - normal (Gaussian) distribution */
+  def normal = newResultValue(value + Random.nextGaussian * err, err2)
 
   override def plus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
     x.value + y.value, x.err2 + y.err2)
@@ -78,6 +82,12 @@ case class DoubleE(
     newResultValue(e, err2 * e * e)
   }
 
+  def log = newResultValue(math.log(value), err2 / value / value)
+
+  def sin = newResultValue(math.sin(value), err2 * { val v = math.cos(value); v * v })
+
+  def cos = newResultValue(math.sin(value), err2 * { val v = math.sin(value); v * v })
+
   // check if values match and ignore the errors
   def ==(a: DoubleE) = value == a.value
 
@@ -117,9 +127,7 @@ object DoubleE {
   def weightedMean(values: Seq[DoubleE]) = {
     values.filter(_.err2 == 0) match {
       case Nil => // weighted mean
-        val x = values.map(x => x / x.err).sum(Zero)
-        val y = values.map(1 / _.err).sum
-        (x / y) + Err(mean(values).err2)
+        values.map(x => x / x.err2).sum(Zero) / values.map(1 / _.err2).sum
       case exactValues => // simple mean of value with zero error (ignore values with error)
         mean(exactValues)
     }
@@ -127,9 +135,11 @@ object DoubleE {
 
   def mean(values: Seq[DoubleE]) = {
     def sqr(x: Double) = x * x
-    val exactMean = values.map(_.value).sum / values.length
-    val meanError2 = values.map(x => sqr(x.value - exactMean.value)).sum / values.length
-    Err(meanError2) + exactMean
+
+    val count = if (values.nonEmpty) values.length else 1
+    val exactMean = values.map(_.value).sum / count
+    val meanError2 = values.map(x => sqr(x.value - exactMean.value)).sum / count
+    DoubleE(exactMean, meanError2)
   }
 
   implicit def fromInt(a: Int): DoubleE = fromDouble(a)

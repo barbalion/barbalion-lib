@@ -1,12 +1,16 @@
 package com.barbalion.lib.react
 
 /** Base for reactive Calculators
+  *
   * @see [[com.barbalion.lib.react.InstantCalculator]]
   * @see [[com.barbalion.lib.react.SmartCalculator]]
   */
 abstract class Calculator {
-  def calc(r: Reactive[_])
-  def reCalc(r: Reactive[_])
+  def calc(r: Reactive[_]): Unit
+
+  def reCalc(r: Reactive[_]): Unit
+
+  def reCalc(rs: TraversableOnce[Reactive[_]]): Unit
 }
 
 

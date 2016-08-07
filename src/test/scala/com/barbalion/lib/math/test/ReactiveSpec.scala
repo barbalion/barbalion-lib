@@ -4,7 +4,7 @@ import com.barbalion.lib.react.{Reactive, SmartCalculator}
 import org.scalatest.{FlatSpec, Matchers}
 
 class ReactiveSpec extends FlatSpec with Matchers {
-  implicit val calculator = SmartCalculator.calculator
+  implicit val calculator = SmartCalculator
   val x = Reactive(1.5)
   "Static reactive value " must " keep its value" in {
     x.value should be(1.5)
@@ -54,7 +54,7 @@ class ReactiveSpec extends FlatSpec with Matchers {
     seq.value should be(6)
   }
 
-  "Circular " must " calcualte " in {
+  "Circular " must " calculate " in {
     calculator.done should be (true)
     val c1 = Reactive(0)
     val c2 = Reactive(0)
@@ -67,6 +67,20 @@ class ReactiveSpec extends FlatSpec with Matchers {
     c1.value should be(4)
     c2.value should be(5)
     calculator.done should be (false)
+  }
+
+  "Consume usage model " must " calculate " in {
+    var c1 = Reactive(0)
+    val c2 = new Reactive[Int] {
+      override protected def default: Int = 0
+      value = () => {
+        c1.value + 1
+      }
+      consume(c1)
+    }
+    c2.value should be(1)
+    c1.value = 1
+    c2.value should be(2)
   }
 
 }

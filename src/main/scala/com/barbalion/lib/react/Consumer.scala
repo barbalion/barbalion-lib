@@ -33,8 +33,7 @@ trait Consumer {
     producers.clear()
   }
   /** Notification implementation. Will be invoked by producers on changes.
-    *
     * @param p the producer which value changed
     */
-  protected[react] def notify(p: Producer[_])
+  protected[react] def producerChanged(p: Producer[_])
 }

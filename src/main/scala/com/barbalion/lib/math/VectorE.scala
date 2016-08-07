@@ -36,6 +36,8 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
   def pos = (x.value, y.value)
 
   def posFloat = (x.value.toFloat, y.value.toFloat)
+
+  def reverse = Vector2E(-x, -y)
 }
 
 case class Vector3E(x: DoubleE, y: DoubleE, z: DoubleE) extends VectorE(List(x, y, z)) {
