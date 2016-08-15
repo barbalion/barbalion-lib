@@ -5,15 +5,12 @@ import scala.collection.mutable
 /**
   * Smart calculator to process circular dependencies (with some overhead and synchronization).
   */
-class SmartCalculator extends Calculator {
+class SmartCalculator extends Calculator with QueuedCalculator {
   protected val calcStack = mutable.Set[Reactive[_]]()
-  protected val queue = mutable.Set[Reactive[_]]()
 
-  override def calc(r: Reactive[_]): Unit = synchronized {
-    reCalc(r)
-  }
+  override def valueSet(r: Reactive[_]): Unit = r.invalidate()
 
-  override def reCalc(r: Reactive[_]): Unit = synchronized {
+  override def firstCalc(r: Reactive[_]): Unit = {
     if (calcStack.contains(r)) {
       queue += r
     } else {
@@ -26,33 +23,9 @@ class SmartCalculator extends Calculator {
     }
   }
 
-  override def reCalc(rs: TraversableOnce[Reactive[_]]): Unit = rs foreach reCalc
+  override def reCalc(r: Reactive[_]): Unit = r.invalidate()
 
-  /**
-    * Check if the calculation was completed (no circular dependencies found).
-    *
-    * @return
-    */
-  def done: Boolean = queue.isEmpty
-
-  /**
-    * Continues calculation if it wasn't [[done]].
-    *
-    * @return number of value recalculated
-    */
-  def continue(): Int = synchronized {
-    if (queue.nonEmpty) {
-      queue.clone() foreach (r => {
-        queue -= r
-        reCalc(r)
-      })
-      queue.size
-    } else
-      0
-  }
-
-  def clearQueue() = synchronized { queue.clear() }
-
+  override protected def continueQueue(queue: TraversableOnce[Reactive[_]]): Unit = queue foreach reCalc
 }
 
 object SmartCalculator extends SmartCalculator

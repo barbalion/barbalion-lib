@@ -36,7 +36,7 @@ class DoubleESpec extends FlatSpec {
     }
 
     withClue("mean") {
-      val e: DoubleE = mean(list)
+      val e: DoubleE = exactMean(list)
       e.value should be(2.5)
       e.err2 should be(1.25)
     }

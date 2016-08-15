@@ -1,10 +1,10 @@
 package com.barbalion.lib.math.test
 
-import com.barbalion.lib.react.{Reactive, SmartCalculator}
+import com.barbalion.lib.react._
 import org.scalatest.{FlatSpec, Matchers}
 
 class ReactiveSpec extends FlatSpec with Matchers {
-  implicit val calculator = SmartCalculator
+  implicit val smartCalculator = SmartCalculator
   val x = Reactive(1.5)
   "Static reactive value " must " keep its value" in {
     x.value should be(1.5)
@@ -54,21 +54,6 @@ class ReactiveSpec extends FlatSpec with Matchers {
     seq.value should be(6)
   }
 
-  "Circular " must " calculate " in {
-    calculator.done should be (true)
-    val c1 = Reactive(0)
-    val c2 = Reactive(0)
-    c2.value = c1(c1 => c1 + 1)
-    c1.value = c2(c2 => c2 + 1)
-    c1.value should be(2)
-    c2.value should be(3)
-    calculator.done should be (false)
-    calculator.continue()
-    c1.value should be(4)
-    c2.value should be(5)
-    calculator.done should be (false)
-  }
-
   "Consume usage model " must " calculate " in {
     var c1 = Reactive(0)
     val c2 = new Reactive[Int] {
@@ -82,5 +67,40 @@ class ReactiveSpec extends FlatSpec with Matchers {
     c1.value = 1
     c2.value should be(2)
   }
+
+  "SmartCalculator" must "calculate circular dependencies" in {
+    smartCalculator.done should be (true)
+    val c1 = Reactive(0)
+    val c2 = Reactive(0)
+    c2.value = c1(c1 => c1 + 1)
+    c1.value = c2(c2 => c2 + 1)
+    c1.value should be(2)
+    c2.value should be(3)
+    smartCalculator.done should be (false)
+//    smartCalculator.continue()
+    c1.value should be(4)
+    c2.value should be(5)
+    smartCalculator.done should be (false)
+  }
+
+  "WaveCalculator" must "calculate circular dependencies" in {
+    val wc = WaveCalculator
+    wc.done should be (true)
+    val c1 = Reactive(0)(wc)
+    val c2 = Reactive(0)(wc)
+    c2.value = c1(c1 => c1 + 1)
+    c1.value = c2(c2 => c2 + 1)
+    wc.continue()
+    c1.value should be(2)
+    c2.value should be(3)
+    wc.done should be (false)
+    wc.continue()
+    c1.value should be(4)
+    c2.value should be(3)
+    wc.continue()
+    c2.value should be(5)
+    wc.done should be (false)
+  }
+
 
 }

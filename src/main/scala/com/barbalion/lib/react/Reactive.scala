@@ -1,5 +1,4 @@
 package com.barbalion.lib.react
-import scala.collection.mutable
 
 /** Reactive Cell implementation. It can store one [[Reactive#value() value]] of type <code>T</code>.
   * The value can be dependant of other cells.
@@ -13,7 +12,8 @@ import scala.collection.mutable
 abstract class Reactive[T](implicit val calculator: Calculator) extends Producer[T] with Consumer {
   /**
     * Constructor to subscribe to the Producers
-    * @param ps list of producers to subscribe for
+    *
+    * @param ps         list of producers to subscribe for
     * @param calculator [[com.barbalion.lib.react.Calculator Calculator]] to run calculations
     */
   def this(ps: Producer[_]*)(implicit calculator: Calculator) = {
@@ -21,14 +21,17 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     consume(ps)
   }
 
-  /**
-    * Cached last known value
-    */
-  protected var lastValue: T = default
+  private var valid = true
+
   /**
     * The variable function that will calculate the result for us
     */
   protected var calc: () => T = () => default
+
+  /**
+    * Cached last known value
+    */
+  protected var lastValue: T = default
 
   /** Set constant value to the cell
     * No any trigger will affect this constant value.
@@ -38,13 +41,13 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
   def value_=(v: T) = {
     calc = () => v
     unConsumeAll()
-    calculator.calc(this)
+    doCalc()
   }
 
   def value_=(v: () => T) = {
     calc = v
     unConsumeAll()
-    calculator.calc(this)
+    calculator.valueSet(this)
   }
 
   /** Syntax sugar to spawn new dependent reactive cell
@@ -59,7 +62,23 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     *
     * @return current value of the cell
     */
-  override def value: T = lastValue
+  override def value: T = {
+    if (!valid) calculator.firstCalc(this)
+    lastValue
+  }
+
+  /**
+    * Invalidate cell value and re-calculate it next time it's read.
+    */
+  def invalidate(): Unit = {
+    if (valid) {
+      valid = false
+      consumers foreach {
+        case r: Reactive[_] => r.invalidate()
+        case _ =>
+      }
+    }
+  }
 
   /** Set reactive value to the cell. It will automatically re-calculate if producer (i.e. other cells) changes.
     *
@@ -73,23 +92,18 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     calc = () => fun(producers.map(_.value))
     unConsumeAll()
     consume(producers)
-    calculator.calc(this)
+    calculator.valueSet(this)
   }
 
-  /** Recalculates and assign new value */
+  /** Recalculates and assign new value, trigger notification if it was changed */
   protected[react] def doCalc() = {
-    changeValue(calc())
-  }
-
-  /** Assigned new value and trigger notification if it was changed
-    *
-    * @param v new value
-    */
-  private def changeValue(v: T) = {
-    if (isDifferent(v, lastValue)) {
-      lastValue = v
-      notifyConsumers()
+    calc() match {
+      case v if isDifferent(v, lastValue) =>
+        lastValue = v
+        notifyConsumers()
+      case _ =>
     }
+    valid = true
   }
 
   /** Compares two value to trigger notification if the value changed. To be overridden in descendants.
@@ -113,14 +127,6 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
   @inline def unbind() = value = lastValue
 
   override protected[react] def producerChanged(p: Producer[_]): Unit = calculator.reCalc(this)
-
-  override protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]): Unit = {
-    val cons = consumers groupBy (_.isInstanceOf[Reactive[_]])
-    // calc reactive consumers as list
-    calculator.reCalc(cons.getOrElse(true, Nil) map (_.asInstanceOf[Reactive[_]]))
-    // notify other consumers
-    cons.getOrElse(false, Nil) foreach(_.producerChanged(this))
-  }
 
   /** Initial default value of the <code>Reactive</code> cell.
     * If another value wasn't set to the cell then default will be re-calculated each time cell receives notification from [[com.barbalion.lib.react.Producer Producers]] */

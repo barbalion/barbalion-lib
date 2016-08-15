@@ -124,25 +124,27 @@ case class DoubleE(
 }
 
 object DoubleE {
-  def weightedMean(values: Seq[DoubleE]) = {
+  def weightedMean(values: List[DoubleE]) = {
     values.filter(_.err2 == 0) match {
       case Nil => // weighted mean
         values.map(x => x / x.err2).sum(Zero) / values.map(1 / _.err2).sum
       case exactValues => // simple mean of value with zero error (ignore values with error)
-        mean(exactValues)
+        exactMean(exactValues)
     }
   }
 
-  def mean(values: Seq[DoubleE]) = {
+  def exactMean(values: List[DoubleE]): DoubleE = {
     def sqr(x: Double) = x * x
 
-    val count = if (values.nonEmpty) values.length else 1
-    val exactMean = values.map(_.value).sum / count
-    val meanError2 = values.map(x => sqr(x.value - exactMean.value)).sum / count
+    val count = if (values.nonEmpty) values.size else 1
+    val exactMean = (values map (_.value)).sum / count
+    val meanError2 = values.map(x => sqr(x.value - exactMean)).sum / count
     DoubleE(exactMean, meanError2)
   }
 
   implicit def fromInt(a: Int): DoubleE = fromDouble(a)
+
+  implicit def fromDouble2(v: (Double, Double)): DoubleE = DoubleE(v._1, v._2)
 
   implicit def fromDouble(a: Double): DoubleE = a match {
     case 0.0 => Zero
@@ -155,15 +157,11 @@ object DoubleE {
 
   implicit def infixFractionalOps(x: DoubleE): DoubleE#FractionalOps = new x.FractionalOps(x)
 
-  object Zero extends DoubleE(0, 0)
-
-  object One extends DoubleE(1, 0)
-
-  object Two extends DoubleE(2, 0)
-
-  object Three extends DoubleE(3, 0)
-
-  object Four extends DoubleE(4, 0)
+  val Zero = DoubleE(0, 0)
+  val One = DoubleE(1, 0)
+  val Two = DoubleE(2, 0)
+  val Three = DoubleE(3, 0)
+  val Four = DoubleE(4, 0)
 
   /* here comes NaN implementation */
   object NaN extends DoubleE(Double.NaN, Double.NaN) {

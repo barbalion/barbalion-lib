@@ -11,7 +11,7 @@ trait Producer[T] {
   /**
     * Set of consumers
     */
-  private val consumers = new mutable.HashSet[Consumer]
+  protected val consumers = new mutable.HashSet[Consumer]
 
   /**
     * The produced value

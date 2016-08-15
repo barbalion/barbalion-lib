@@ -1,28 +1,18 @@
 package com.barbalion.lib.react
 
-import scala.collection.mutable
+/**
+  * Calculates only one level of dependencies at once. Call continue() to calc the rest. Works fine with circular dependencies.
+  */
+class WaveCalculator extends Calculator with QueuedCalculator {
 
-class WaveCalculator extends Calculator {
-  protected val set = mutable.Set[Reactive[_]]()
-  protected val queue = mutable.Queue[Reactive[_]]()
+  override def valueSet(r: Reactive[_]): Unit = r.doCalc()
 
-  override def calc(r: Reactive[_]): Unit = {
-    if (set.add(r))
-      queue += r
-  }
+  override def firstCalc(r: Reactive[_]): Unit = r.doCalc()
 
-  override def reCalc(r: Reactive[_]): Unit = calc(r)
+  override def reCalc(r: Reactive[_]): Unit = queue += r
 
-  override def reCalc(rs: TraversableOnce[Reactive[_]]): Unit = rs foreach calc
+  override def continueQueue(queue: TraversableOnce[Reactive[_]]): Unit = queue foreach (_.doCalc())
 
-  def continue() = {
-    val clone = queue.clone
-    queue.clear()
-    set.clear()
-    clone foreach (_.doCalc())
-  }
-
-  def done = queue.isEmpty
 }
 
 object WaveCalculator extends WaveCalculator

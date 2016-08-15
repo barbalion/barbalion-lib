@@ -6,11 +6,11 @@ package com.barbalion.lib.react
   * @see [[com.barbalion.lib.react.SmartCalculator]]
   */
 abstract class Calculator {
-  def calc(r: Reactive[_]): Unit
+  def valueSet(r: Reactive[_]): Unit
+
+  def firstCalc(r: Reactive[_]): Unit
 
   def reCalc(r: Reactive[_]): Unit
-
-  def reCalc(rs: TraversableOnce[Reactive[_]]): Unit
 }
 
 

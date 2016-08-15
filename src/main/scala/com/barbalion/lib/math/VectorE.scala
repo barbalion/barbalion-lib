@@ -18,7 +18,7 @@ abstract class VectorE[T <: VectorE[_]](val coordinates: List[DoubleE]) {
 
   def -(a: VectorE[T]) = combineVectors(a, Zero.minus)
 
-  private def combineVectors(a: VectorE[T], op: (DoubleE, DoubleE) => DoubleE) = buildInstance(
+  protected def combineVectors(a: VectorE[T], op: (DoubleE, DoubleE) => DoubleE) = buildInstance(
     (coordinates, a.coordinates).zipped map op
   )
 
@@ -31,6 +31,10 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
     case _ => throw new Exception("Bad vector.")
   }
 
+  def +(a: Vector2E) = combineVectors(a, Zero.plus).asInstanceOf[Vector2E]
+
+  def -(a: Vector2E) = combineVectors(a, Zero.minus).asInstanceOf[Vector2E]
+
   def posE = (x, y)
 
   def pos = (x.value, y.value)
@@ -38,6 +42,15 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
   def posFloat = (x.value.toFloat, y.value.toFloat)
 
   def reverse = Vector2E(-x, -y)
+}
+
+object Vector2E {
+  implicit def tuple2conv(v: (DoubleE, DoubleE)): Vector2E = Vector2E(v._1, v._2)
+
+  def weightedMean(vs: List[Vector2E]) = vs match {
+    case Nil => None
+    case _ => Some(Vector2E(DoubleE.weightedMean(vs map (_.x)), DoubleE.weightedMean(vs map (_.y))))
+  }
 }
 
 case class Vector3E(x: DoubleE, y: DoubleE, z: DoubleE) extends VectorE(List(x, y, z)) {
