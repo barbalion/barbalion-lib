@@ -10,7 +10,7 @@ class SmartCalculator extends Calculator with QueuedCalculator {
 
   override def valueSet(r: Reactive[_]): Unit = r.invalidate()
 
-  override def firstCalc(r: Reactive[_]): Unit = {
+  override def firstUse(r: Reactive[_]): Unit = {
     if (calcStack.contains(r)) {
       queue += r
     } else {

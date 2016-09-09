@@ -4,7 +4,7 @@ import scala.collection.mutable
 /**
   * Trait for calculators with unordered queue
   */
-trait QueuedCalculator {
+trait QueuedCalculator extends Calculator {
 
   protected val queue = mutable.Set[Reactive[_]]()
 

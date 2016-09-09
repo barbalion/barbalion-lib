@@ -8,7 +8,7 @@ package com.barbalion.lib.react
 abstract class Calculator {
   def valueSet(r: Reactive[_]): Unit
 
-  def firstCalc(r: Reactive[_]): Unit
+  def firstUse(r: Reactive[_]): Unit
 
   def reCalc(r: Reactive[_]): Unit
 }

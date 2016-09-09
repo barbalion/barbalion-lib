@@ -26,7 +26,7 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
   /**
     * The variable function that will calculate the result for us
     */
-  protected var calc: () => T = () => default
+  protected var calcFunction: () => T = () => default
 
   /**
     * Cached last known value
@@ -38,14 +38,10 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     *
     * @param v the value
     */
-  def value_=(v: T) = {
-    calc = () => v
-    unConsumeAll()
-    doCalc()
-  }
+  def :=(v: T): Unit = :=(() => v)
 
-  def value_=(v: () => T) = {
-    calc = v
+  def :=(v: () => T): Unit = {
+    calcFunction = v
     unConsumeAll()
     calculator.valueSet(this)
   }
@@ -63,7 +59,7 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     * @return current value of the cell
     */
   override def value: T = {
-    if (!valid) calculator.firstCalc(this)
+    if (!valid) calculator.firstUse(this)
     lastValue
   }
 
@@ -87,9 +83,9 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     * @tparam V the type of producers
     */
   //
-  def value_=[V](v: (Seq[Producer[V]], Seq[V] => T)): Unit = {
+  def :=[V](v: (Seq[Producer[V]], Seq[V] => T)): Unit = {
     val (producers, fun) = v
-    calc = () => fun(producers.map(_.value))
+    calcFunction = () => fun(producers.map(_.value))
     unConsumeAll()
     consume(producers)
     calculator.valueSet(this)
@@ -97,7 +93,7 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
 
   /** Recalculates and assign new value, trigger notification if it was changed */
   protected[react] def doCalc() = {
-    calc() match {
+    calcFunction() match {
       case v if isDifferent(v, lastValue) =>
         lastValue = v
         notifyConsumers()
@@ -124,7 +120,7 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
 
   /** Unsubscribe from all producers and keep last value, so no new recalculation of the value will occur.
     */
-  @inline def unbind() = value = lastValue
+  @inline def unbind() = :=(lastValue)
 
   override protected[react] def producerChanged(p: Producer[_]): Unit = calculator.reCalc(this)
 
@@ -162,7 +158,7 @@ object Reactive {
   def apply[T, V](producers: Seq[Reactive[V]], fun: Seq[V] => T)(implicit calculator: Calculator) = new Reactive[T]()(calculator) {
     override protected def default: T = fun(producers map (_.value))
 
-    value = (producers, fun)
+    :=((producers, fun))
   }
 
   implicit def reactTupleConv[T1, T2](t: (Reactive[T1], Reactive[T2]))(implicit calculator: Calculator): ReactiveTuple2[T1, T2] = new ReactiveTuple2(t)
