@@ -13,7 +13,7 @@ trait Consumer {
     *
     * @param ps producers to subscribe
     */
-  protected[react] def consume(ps: Seq[Producer[_]]): Unit = producers.synchronized({
+  protected[react] def consume(ps: TraversableOnce[Producer[_]]): Unit = producers.synchronized({
     ps.foreach((p) => {
       p.subscribe(this)
       producers.add(p)

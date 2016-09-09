@@ -52,7 +52,7 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     * @tparam V type of the result
     * @return new <code>Reactive[V]</code> object
     */
-  @inline def >>[V](f: (T) => V) = Reactive(this :: Nil, (l: Seq[T]) => f(value))
+  @inline def >>[V](f: (T) => V) = Reactive(this :: Nil, (l: TraversableOnce[T]) => f(value))
 
   /** The produced value
     *
@@ -83,7 +83,7 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     * @tparam V the type of producers
     */
   //
-  def :=[V](v: (Seq[Producer[V]], Seq[V] => T)): Unit = {
+  def :=[V](v: (TraversableOnce[Producer[V]], TraversableOnce[V] => T)): Unit = {
     val (producers, fun) = v
     calcFunction = () => fun(producers.map(_.value))
     unConsumeAll()
@@ -116,7 +116,7 @@ abstract class Reactive[T](implicit val calculator: Calculator) extends Producer
     * @tparam V type of the result
     * @return returns Tuple-object to be assigned to <code>value</code> property of <code>Reactive[V]</code>
     */
-  @inline def apply[V](f: (T) => V) = (Seq(this), (l: Seq[T]) => f(value))
+  @inline def apply[V](f: (T) => V) = (Seq(this), (l: TraversableOnce[T]) => f(value))
 
   /** Unsubscribe from all producers and keep last value, so no new recalculation of the value will occur.
     */
@@ -155,7 +155,7 @@ object Reactive {
     * @tparam V type of source values
     * @return new instance of Reactive object calculated from sources.
     */
-  def apply[T, V](producers: Seq[Reactive[V]], fun: Seq[V] => T)(implicit calculator: Calculator) = new Reactive[T]()(calculator) {
+  def apply[T, V](producers: TraversableOnce[Reactive[V]], fun: TraversableOnce[V] => T)(implicit calculator: Calculator) = new Reactive[T]()(calculator) {
     override protected def default: T = fun(producers map (_.value))
 
     :=((producers, fun))
@@ -203,138 +203,138 @@ object Reactive {
 
   implicit def reactTupleConv[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17], Reactive[T18], Reactive[T19], Reactive[T20], Reactive[T21], Reactive[T22]))(implicit calculator: Calculator): ReactiveTuple22[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22] = new ReactiveTuple22(t)
 
-  class ReactiveSeq[T](seq: Seq[Reactive[T]])(implicit calculator: Calculator) {
-    @inline def >>[V](f: Seq[T] => V) = Reactive(seq, (a: Seq[T]) => f(a))
+  class ReactiveTraversableOnce[T](seq: TraversableOnce[Reactive[T]])(implicit calculator: Calculator) {
+    @inline def >>[V](f: TraversableOnce[T] => V) = Reactive(seq, (a: TraversableOnce[T]) => f(a))
 
-    @inline def apply[V](f: Seq[T] => V) = (seq, f)
+    @inline def apply[V](f: TraversableOnce[T] => V) = (seq, f)
   }
 
-  implicit def reactSeqConv[T](seq: Seq[Reactive[T]])(implicit calculator: Calculator): ReactiveSeq[T] = new ReactiveSeq[T](seq)
+  implicit def reactSeqConv[T](seq: TraversableOnce[Reactive[T]])(implicit calculator: Calculator): ReactiveTraversableOnce[T] = new ReactiveTraversableOnce[T](seq)
 
   class ReactiveTuple2[T1, T2](t: (Reactive[T1], Reactive[T2]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2) => V) = Reactive(Seq(t._1, t._2).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value))
+    @inline def >>[V](f: (T1, T2) => V) = Reactive(Seq(t._1, t._2).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value))
 
-    @inline def apply[V](f: (T1, T2) => V) = (Seq(t._1, t._2).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value))
+    @inline def apply[V](f: (T1, T2) => V) = (Seq(t._1, t._2).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value))
   }
 
   class ReactiveTuple3[T1, T2, T3](t: (Reactive[T1], Reactive[T2], Reactive[T3]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3) => V) = Reactive(Seq(t._1, t._2, t._3).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value))
+    @inline def >>[V](f: (T1, T2, T3) => V) = Reactive(Seq(t._1, t._2, t._3).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value))
 
-    @inline def apply[V](f: (T1, T2, T3) => V) = (Seq(t._1, t._2, t._3).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value))
+    @inline def apply[V](f: (T1, T2, T3) => V) = (Seq(t._1, t._2, t._3).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value))
   }
 
   class ReactiveTuple4[T1, T2, T3, T4](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4) => V) = Reactive(Seq(t._1, t._2, t._3, t._4).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value))
+    @inline def >>[V](f: (T1, T2, T3, T4) => V) = Reactive(Seq(t._1, t._2, t._3, t._4).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4) => V) = (Seq(t._1, t._2, t._3, t._4).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value))
+    @inline def apply[V](f: (T1, T2, T3, T4) => V) = (Seq(t._1, t._2, t._3, t._4).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value))
   }
 
   class ReactiveTuple5[T1, T2, T3, T4, T5](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5) => V) = (Seq(t._1, t._2, t._3, t._4, t._5).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5) => V) = (Seq(t._1, t._2, t._3, t._4, t._5).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value))
   }
 
   class ReactiveTuple6[T1, T2, T3, T4, T5, T6](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value))
   }
 
   class ReactiveTuple7[T1, T2, T3, T4, T5, T6, T7](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value))
   }
 
   class ReactiveTuple8[T1, T2, T3, T4, T5, T6, T7, T8](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value))
   }
 
   class ReactiveTuple9[T1, T2, T3, T4, T5, T6, T7, T8, T9](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value))
   }
 
   class ReactiveTuple10[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value))
   }
 
   class ReactiveTuple11[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value))
   }
 
   class ReactiveTuple12[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value))
   }
 
   class ReactiveTuple13[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value))
   }
 
   class ReactiveTuple14[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value))
   }
 
   class ReactiveTuple15[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value))
   }
 
   class ReactiveTuple16[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value))
   }
 
   class ReactiveTuple17[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value))
   }
 
   class ReactiveTuple18[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17], Reactive[T18]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value))
   }
 
   class ReactiveTuple19[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17], Reactive[T18], Reactive[T19]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value))
   }
 
   class ReactiveTuple20[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17], Reactive[T18], Reactive[T19], Reactive[T20]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value))
   }
 
   class ReactiveTuple21[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17], Reactive[T18], Reactive[T19], Reactive[T20], Reactive[T21]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value))
   }
 
   class ReactiveTuple22[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17], Reactive[T18], Reactive[T19], Reactive[T20], Reactive[T21], Reactive[T22]))(implicit calculator: Calculator) {
-    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21, t._22).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value, t._22.value))
+    @inline def >>[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) => V) = Reactive(Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21, t._22).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value, t._22.value))
 
-    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21, t._22).asInstanceOf[List[Reactive[V]]], (v: Seq[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value, t._22.value))
+    @inline def apply[V](f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) => V) = (Seq(t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12, t._13, t._14, t._15, t._16, t._17, t._18, t._19, t._20, t._21, t._22).asInstanceOf[List[Reactive[V]]], (v: TraversableOnce[V]) => f(t._1.value, t._2.value, t._3.value, t._4.value, t._5.value, t._6.value, t._7.value, t._8.value, t._9.value, t._10.value, t._11.value, t._12.value, t._13.value, t._14.value, t._15.value, t._16.value, t._17.value, t._18.value, t._19.value, t._20.value, t._21.value, t._22.value))
   }
 
 }
