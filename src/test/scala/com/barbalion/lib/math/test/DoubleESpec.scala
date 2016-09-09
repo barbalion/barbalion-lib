@@ -7,9 +7,9 @@ import org.scalatest.Matchers._
 
 class DoubleESpec extends FlatSpec {
   {
-    Zero.value == 0 && Zero.err == 0 && Zero == new DoubleE(0, 0) should be(true)
+    Zero.value == 0 && Zero.err != 0 && Zero == new DoubleE(0, 0) should be(true)
 
-    One.value == 1 && One.err == 0 && One == new DoubleE(1, 0) should be(true)
+    One.value == 1 && One.err != 0 && One == new DoubleE(1, 0) should be(true)
 
     Zero != DoubleE(1, 0) shouldBe true
 
@@ -32,7 +32,8 @@ class DoubleESpec extends FlatSpec {
     "error2 of sum" must " be equal sum of error2s" in {
       assert((x + y).err2 == 13)
       assert((x + Err(6)).err2 == 10)
-      assert((One + Two).err2 == 0)
+      assert((One + Two).err2 == One.err2 + Two.err2)
+      assert((One - Two).err2 == One.err2 + Two.err2)
     }
 
     withClue("mean") {
@@ -49,7 +50,8 @@ class DoubleESpec extends FlatSpec {
       val v1 = DoubleE(1, 0.1 * 0.1)
       val v2 = DoubleE(2, 1)
       val m1: DoubleE = weightedMean(v1 :: v2 :: Nil)
-      m1.err should be < v1.err
+      val randomValues = (1 to 10000) map (_ => DoubleE(math.random, math.random / 10))
+      weightedMean(randomValues.toList).err2 should be <= randomValues.map(_.err2).min
     }
 
     withClue("Constant cache") {

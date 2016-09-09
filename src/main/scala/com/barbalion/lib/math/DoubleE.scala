@@ -26,7 +26,7 @@ case class DoubleE(
   lazy val value4 = value2 * value2
 
   /** value with zero error */
-  def exact = newResultValue(value, 0)
+  def exact = newResultValue(value, value * value * DoubleE.DOUBLE_ERROR2)
 
   /** return the value with random error - normal (Gaussian) distribution */
   def normal = newResultValue(value + Random.nextGaussian * err, err2)
@@ -49,7 +49,7 @@ case class DoubleE(
   override def times(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
     x.value * y.value, x.err2 * y.value2 + y.err2 * x.value2)
 
-  override def fromInt(x: Int): DoubleE = newResultValue(x, 0)
+  override def fromInt(x: Int): DoubleE = newResultValue(x, x * x * DoubleE.DOUBLE_ERROR2)
 
   override def div(x: DoubleE, y: DoubleE): DoubleE = withValueOf(y) {
     if (y.value == 0) NaN else newResultValue(x.value / y.value, (x.err2 * y.value2 + y.err2 * x.value2) / y.value4)
@@ -95,8 +95,8 @@ case class DoubleE(
 
   def !==(a: DoubleE) = !(this === a)
 
-  // check if both the values and the errors matches
-  def ===(a: DoubleE) = value == a.value && err2 == a.err2
+  // check if the values match within errors
+  def ===(a: DoubleE) = (value - a.value) * (value - a.value) < err2 + a.err2
 
   override def toString: String = if (err == 0) value.toString else value.toString + "+-" + err.toString
 
@@ -152,16 +152,18 @@ object DoubleE {
     case 2.0 => Two
     case 3.0 => Three
     case 4.0 => Four
-    case _ => new DoubleE(a, 0)
+    case _ => new DoubleE(a, a * a * DOUBLE_ERROR2)
   }
+
+  val DOUBLE_ERROR2 = 1e-18 * 1e-18
 
   implicit def infixFractionalOps(x: DoubleE): DoubleE#FractionalOps = new x.FractionalOps(x)
 
-  val Zero = DoubleE(0, 0)
-  val One = DoubleE(1, 0)
-  val Two = DoubleE(2, 0)
-  val Three = DoubleE(3, 0)
-  val Four = DoubleE(4, 0)
+  val Zero = DoubleE(0, DOUBLE_ERROR2)
+  val One = DoubleE(1, DOUBLE_ERROR2)
+  val Two = DoubleE(2, 4 * DOUBLE_ERROR2)
+  val Three = DoubleE(3, 9 * DOUBLE_ERROR2)
+  val Four = DoubleE(4, 16 * DOUBLE_ERROR2)
 
   /* here comes NaN implementation */
   object NaN extends DoubleE(Double.NaN, Double.NaN) {
