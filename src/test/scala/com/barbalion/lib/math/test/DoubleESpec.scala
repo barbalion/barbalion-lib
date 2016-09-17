@@ -29,11 +29,14 @@ class DoubleESpec extends FlatSpec {
     x.err shouldBe 2
     x.err2 shouldBe 4
 
-    "error2 of sum" must " be equal sum of error2s" in {
+    "error2 of sum" must "be equal sum of error2s" in {
       assert((x + y).err2 == 13)
       assert((x + Err(6)).err2 == 10)
-      assert((One + Two).err2 == One.err2 + Two.err2)
-      assert((One - Two).err2 == One.err2 + Two.err2)
+    }
+
+    "Fixed error2 with double error" must "be checked" in {
+      assert((One + Two + Zero).err2 > One.err2 + Two.err2)
+      assert((One - Two + Zero).err2 > One.err2 + Two.err2)
     }
 
     withClue("mean") {

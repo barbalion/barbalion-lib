@@ -29,13 +29,13 @@ case class DoubleE(
   def exact = newResultValue(value, value * value * DoubleE.DOUBLE_ERROR2)
 
   /** return the value with random error - normal (Gaussian) distribution */
-  def normal = newResultValue(value + Random.nextGaussian * err, err2)
+  def normal = newResultValue(value + Random.nextGaussian * err, fixedErr2)
 
   override def plus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
-    x.value + y.value, x.err2 + y.err2)
+    x.value + y.value, x.fixedErr2 + y.fixedErr2)
 
   protected def newResultValueWithY(y: DoubleE)(value: Double, err2: Double) = withValueOf(y) {
-    new DoubleE(value, err2)
+    newResultValue(value, err2)
   }
 
   private def withValueOf(value: DoubleE)(m: => DoubleE): DoubleE = value match {
@@ -44,49 +44,56 @@ case class DoubleE(
   }
 
   override def minus(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
-    x.value - y.value, x.err2 + y.err2)
+    x.value - y.value, x.fixedErr2 + y.fixedErr2)
 
   override def times(x: DoubleE, y: DoubleE): DoubleE = newResultValueWithY(y)(
-    x.value * y.value, x.err2 * y.value2 + y.err2 * x.value2)
+    x.value * y.value, x.fixedErr2 * y.value2 + y.fixedErr2 * x.value2)
 
   override def fromInt(x: Int): DoubleE = newResultValue(x, x * x * DoubleE.DOUBLE_ERROR2)
 
   override def div(x: DoubleE, y: DoubleE): DoubleE = withValueOf(y) {
-    if (y.value == 0) NaN else newResultValue(x.value / y.value, (x.err2 * y.value2 + y.err2 * x.value2) / y.value4)
+    newResultValue(x.value / y.value, (x.fixedErr2 * y.value2 + y.fixedErr2 * x.value2) / y.value4)
   }
 
   def +(a: Int): DoubleE = this + a.toDouble
 
-  def +(a: Double) = newResultValue(value + a, err2)
+  def +(a: Double) = newResultValue(value + a, fixedErr2)
 
-  protected def newResultValue(value: Double, err2: Double) = new DoubleE(value, err2)
+  protected lazy val fixedErr2 = {
+    val minErr2 = value * value * DoubleE.DOUBLE_ERROR2
+    if (err2.isNaN || err2 < minErr2) minErr2 else err2
+  }
+
+  protected def newResultValue(value: Double, err2: Double) = {
+    new DoubleE(value, err2)
+  }
 
   def -(a: Int): DoubleE = this - a.toDouble
 
-  def -(a: Double) = newResultValue(value - a, err2)
+  def -(a: Double) = newResultValue(value - a, fixedErr2)
 
   def *(a: Int): DoubleE = this * a.toDouble
 
-  def *(a: Double) = newResultValue(value * a, err2 * (a * a))
+  def *(a: Double) = newResultValue(value * a, fixedErr2 * (a * a))
 
   def /(a: Int): DoubleE = this / a.toDouble
 
-  def /(a: Double) = if (a == 0) NaN else newResultValue(value / a, err2 / (a * a))
+  def /(a: Double) = if (a == 0) NaN else newResultValue(value / a, fixedErr2 / (a * a))
 
-  def sqr = newResultValue(value2, 4 * err2 * value2)
+  def sqr = newResultValue(value2, 4 * fixedErr2 * value2)
 
-  def sqrt = if (value < 0) NaN else newResultValue(Math.sqrt(value), if (value == 0) err2 / 4 else err2 / (4 * value))
+  def sqrt = if (value < 0) NaN else newResultValue(Math.sqrt(value), if (value == 0) fixedErr2 / 4 else fixedErr2 / (4 * value))
 
   def exp = {
     val e: Double = math.exp(value)
-    newResultValue(e, err2 * e * e)
+    newResultValue(e, fixedErr2 * e * e)
   }
 
-  def log = newResultValue(math.log(value), err2 / value / value)
+  def log = newResultValue(math.log(value), fixedErr2 / value / value)
 
-  def sin = newResultValue(math.sin(value), err2 * { val v = math.cos(value); v * v })
+  def sin = newResultValue(math.sin(value), fixedErr2 * { val v = math.cos(value); v * v })
 
-  def cos = newResultValue(math.sin(value), err2 * { val v = math.sin(value); v * v })
+  def cos = newResultValue(math.sin(value), fixedErr2 * { val v = math.sin(value); v * v })
 
   // check if values match and ignore the errors
   def ==(a: DoubleE) = value == a.value
@@ -96,7 +103,7 @@ case class DoubleE(
   def !==(a: DoubleE) = !(this === a)
 
   // check if the values match within errors
-  def ===(a: DoubleE) = (value - a.value) * (value - a.value) < err2 + a.err2
+  def ===(a: DoubleE) = (value - a.value) * (value - a.value) < fixedErr2 + a.fixedErr2
 
   override def toString: String = if (err == 0) value.toString else value.toString + "+-" + err.toString
 
@@ -108,10 +115,10 @@ case class DoubleE(
 
   override def toDouble(x: DoubleE): Double = value.toDouble
 
-  override def negate(x: DoubleE): DoubleE = newResultValue(-value, err2)
+  override def negate(x: DoubleE): DoubleE = newResultValue(-value, fixedErr2)
 
   override def equals(o: scala.Any): Boolean = o match {
-    case a: DoubleE => value.equals(a.value) && err2.equals(a.err2)
+    case a: DoubleE => value.equals(a.value) && fixedErr2.equals(a.fixedErr2)
     case _ => false
   }
 
@@ -125,9 +132,9 @@ case class DoubleE(
 
 object DoubleE {
   def weightedMean(values: List[DoubleE]) = {
-    values.filter(_.err2 == 0) match {
+    values.filter(_.fixedErr2 == 0) match {
       case Nil => // weighted mean
-        values.map(x => x / x.err2).sum(Zero) / values.map(1 / _.err2).sum
+        values.map(x => x / x.fixedErr2).sum(Zero) / values.map(1 / _.fixedErr2).sum
       case exactValues => // simple mean of value with zero error (ignore values with error)
         exactMean(exactValues)
     }
