@@ -86,6 +86,7 @@ class ReactiveSpec extends FlatSpec with Matchers {
 
   "WaveCalculator" must "calculate circular dependencies" in {
     val wc = WaveCalculator
+    wc.clearQueue()
     wc.done should be(true)
     val c1 = Reactive(0)(wc)
     val c2 = Reactive(0)(wc)

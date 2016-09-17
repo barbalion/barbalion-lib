@@ -42,6 +42,8 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
   def posFloat = (x.value.toFloat, y.value.toFloat)
 
   def reverse = Vector2E(-x, -y)
+
+  def phi = math.atan2(y.value, x.value)
 }
 
 object Vector2E {

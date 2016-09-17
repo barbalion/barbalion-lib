@@ -25,5 +25,11 @@ trait QueuedCalculator extends Calculator {
     */
   def done = queue.isEmpty
 
+  /**
+    * The queue length of the calculator
+    * @return
+    */
+  def pending = queue.size
+
   def clearQueue() = synchronized { queue.clear() }
 }
