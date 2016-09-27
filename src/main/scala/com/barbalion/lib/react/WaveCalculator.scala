@@ -15,4 +15,3 @@ class WaveCalculator extends Calculator with QueuedCalculator {
 
 }
 
-object WaveCalculator extends WaveCalculator

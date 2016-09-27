@@ -26,21 +26,36 @@ trait Producer[T] {
     * @param c Consumer to notify
     * @return true if consumer wasn't subscribed yet
     */
-  protected[react] def subscribe(c: Consumer) = consumers.synchronized(consumers.add(c))
+  protected[react] def subscribe(c: Consumer): Unit = consumers.synchronized(consumers.add(c))
 
   /**
-    * Unsubscribes the consumer from the notifications
+    * Subscribes a simple one-time call-back
+    *
+    * @param c Consumer to notify
+    * @param oneTime if true then the callback will be called only once
+    * @return true if consumer wasn't subscribed yet
+    */
+  protected[react] def subscribe(c: => Unit, oneTime: Boolean = false): Unit = subscribe(new Consumer {
+    override protected[react] def producerChanged(p: Producer[_]): Unit = {
+      if (oneTime) unsubscribe(this)
+      c
+    }
+
+  })
+
+  /**
+    * Unsubscribes the [[com.barbalion.lib.react.Consumer Consumer]] from the notifications
     *
     * @param c Consumer to unsubscribe
     * @return true if consumer was subscribed
     */
-  protected[react] def unsubscribe(c: Consumer) = consumers.synchronized(consumers.remove(c))
+  protected[react] def unsubscribe(c: Consumer): Boolean = consumers.synchronized(consumers.remove(c))
 
   /**
     * Notify previously subscribed consumers
     */
-  protected[react] final def notifyConsumers() = doNotifyConsumers(consumers)
+  protected[react] final def notifyConsumers(): Unit = doNotifyConsumers(consumers)
 
-  protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]) = consumers.foreach(_.producerChanged(this))
+  protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]): Unit = consumers.foreach(_.producerChanged(this))
 
 }
