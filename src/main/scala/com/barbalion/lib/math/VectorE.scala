@@ -35,6 +35,17 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
 
   def -(a: Vector2E) = combineVectors(a, Zero.minus).asInstanceOf[Vector2E]
 
+  def /(div: DoubleE) = Vector2E(x / div, y / div)
+
+  def *(div: DoubleE) = Vector2E(x * div, y * div)
+
+  def ==(a: Vector2E) = x.value == a.x.value && y.value == a.y.value
+
+  /**
+    * returns the vector of the same direction and length = 1.0
+    */
+  lazy val normalize = /(r)
+
   def posE = (x, y)
 
   def pos = (x.value, y.value)
@@ -44,15 +55,21 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
   def reverse = Vector2E(-x, -y)
 
   def phi = math.atan2(y.value, x.value)
+
+  def isGoodVector = x.isGoodNumber && y.isGoodNumber
 }
 
 object Vector2E {
-  implicit def tuple2conv(v: (DoubleE, DoubleE)): Vector2E = Vector2E(v._1, v._2)
+  implicit def tuple2convE(v: (DoubleE, DoubleE)): Vector2E = Vector2E(v._1, v._2)
 
-  def weightedMean(vs: List[Vector2E]) = vs match {
-    case Nil => None
+  implicit def tuple2conv(v: (Double, Double)): Vector2E = Vector2E(v._1, v._2)
+
+  def weightedMean(vs: Traversable[Vector2E]): Option[Vector2E] = vs match {
+    case empty if empty.isEmpty => None
     case _ => Some(Vector2E(DoubleE.weightedMean(vs map (_.x)), DoubleE.weightedMean(vs map (_.y))))
   }
+
+  val Zero = Vector2E(DoubleE.Zero, DoubleE.Zero)
 }
 
 case class Vector3E(x: DoubleE, y: DoubleE, z: DoubleE) extends VectorE(List(x, y, z)) {

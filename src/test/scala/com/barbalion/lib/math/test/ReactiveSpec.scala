@@ -4,9 +4,8 @@ import com.barbalion.lib.react._
 import org.scalatest._
 
 class ReactiveSpec extends FlatSpec with Matchers {
-  implicit val smartCalculator = SmartCalculator
-
   {
+    implicit val calculator = InstantCalculator
     val x = Reactive(1.5)
     "Static reactive value " must " keep its value" in {
       x.value.should(be(1.5))
@@ -63,20 +62,25 @@ class ReactiveSpec extends FlatSpec with Matchers {
       c1 := 1
       c2.value should be(2)
     }
+  }
+
+  {
+    implicit val smartCalculator = new SmartCalculator
 
     "SmartCalculator" must "calculate circular dependencies" in {
-      smartCalculator.done should be(true)
       val c1 = Reactive(0)
       val c2 = Reactive(0)
+      smartCalculator.done should be(true)
       c2 := c1 >> (c1 => c1 + 1)
       c1 := c2 >> (c2 => c2 + 1)
+//      smartCalculator.done should be(false)  // todo do we need to check 'done' here?
       c1.value should be(2)
       c2.value should be(3)
-      smartCalculator.done should be(false)
-      smartCalculator.continue()
+//      smartCalculator.done should be(false)
+//      smartCalculator.continue()
       c1.value should be(4)
       c2.value should be(5)
-      smartCalculator.done should be(false)
+//      smartCalculator.done should be(false)
     }
 
     "WaveCalculator" must "calculate circular dependencies" in {

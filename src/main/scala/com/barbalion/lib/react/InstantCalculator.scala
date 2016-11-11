@@ -8,7 +8,7 @@ package com.barbalion.lib.react
 object InstantCalculator extends Calculator {
   override def valueSet(r: Reactive[_]): Unit = r.doCalc()
 
-  override def firstUse(r: Reactive[_]): Unit = r.doCalc()
+  override def valueFirstRead(r: Reactive[_]): Unit = r.doCalc()
 
-  override def reCalc(r: Reactive[_]): Unit = r.doCalc()
+  override def needReCalc(r: Reactive[_]): Unit = r.doCalc()
 }

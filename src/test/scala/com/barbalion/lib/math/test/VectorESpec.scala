@@ -35,4 +35,12 @@ class VectorESpec extends FlatSpec {
     assert(v1.r.value == 5)
   }
 
+  "Vector mean" must "calculate" in {
+    val v1 = Vector2E(DoubleE(3, 1), DoubleE(4, 1))
+    val v2 = Vector2E(DoubleE(5, 1), DoubleE(6, 1))
+    val mean = Vector2E.weightedMean(Seq(v1, v2)).get
+    assert(mean.x.value == 4)
+    assert(mean.y.value == 5)
+  }
+
 }

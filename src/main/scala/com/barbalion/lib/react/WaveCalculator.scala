@@ -7,9 +7,9 @@ class WaveCalculator extends Calculator with QueuedCalculator {
 
   override def valueSet(r: Reactive[_]): Unit = r.doCalc()
 
-  override def firstUse(r: Reactive[_]): Unit = r.doCalc()
+  override def valueFirstRead(r: Reactive[_]): Unit = r.doCalc()
 
-  override def reCalc(r: Reactive[_]): Unit = queue += r
+  override def needReCalc(r: Reactive[_]): Unit = enqueue(r)
 
   override def continueQueue(queue: TraversableOnce[Reactive[_]]): Unit = queue foreach (_.doCalc())
 

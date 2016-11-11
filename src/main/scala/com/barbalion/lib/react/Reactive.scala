@@ -1,6 +1,7 @@
 package com.barbalion.lib.react
 
-/** Reactive Cell implementation. It can store one [[Reactive#value() value]] of type <code>T</code>.
+/**
+  * Reactive Cell implementation. It can store one [[Reactive#value() value]] of type <code>T</code>.
   * The value can be dependant of other cells.
   * Use [[com.barbalion.lib.react.Reactive$ Reactive]] object to create new instances of the cells.
   * Assign new values (constant or reactive) to <code>value</code> property.
@@ -26,7 +27,8 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     */
   protected var lastValue: T = func()
 
-  /** Set calculated value to the cell
+  /**
+    * Set calculated value to the cell
     * Producers will trigger recalculation.
     *
     * @param v the value
@@ -37,14 +39,16 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     calculator.valueSet(this)
   }
 
-  /** Set constant value to the cell
+  /**
+    * Set constant value to the cell
     * No any trigger will affect this constant value.
     *
     * @param v the value
     */
   def :=(v: T): Unit = :=(() => v)
 
-  /** Set reactive value to the cell. It will automatically re-calculate if producer (i.e. other cell) changes.
+  /**
+    * Set reactive value to the cell. It will automatically re-calculate if producer (i.e. other cell) changes.
     *
     * @param v Reactive value. Use syntax sugar to create to [[Reactive]]s.
     */
@@ -54,7 +58,8 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     v.producers foreach (p => consume(p._1))
   }
 
-  /** Syntax sugar to spawn new dependent reactive cell
+  /**
+    * Syntax sugar to spawn new dependent reactive cell
     *
     * @param f function to calculate result
     * @tparam V type of the result
@@ -62,12 +67,13 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     */
   @inline def >>[V](f: (T) => V) = new Reactive(() => f(value), this)
 
-  /** The produced value
+  /**
+    * The produced value, auto-calculated if necessary
     *
     * @return current value of the cell
     */
   override def value: T = {
-    if (!valid) calculator.firstUse(this)
+    if (!valid) calculator.valueFirstRead(this)
     lastValue
   }
 
@@ -84,18 +90,29 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     }
   }
 
-  /** Recalculates and assign new value, trigger notification if it was changed */
+  /**
+    * Recalculates new value, trigger notification if it was changed
+    */
   protected[react] def doCalc(): Unit = {
     calcFunction() match {
-      case v if isDifferent(v, lastValue) =>
-        lastValue = v
-        notifyConsumers()
+      case v if isDifferent(v, lastValue) => onValueChange(v)
       case _ =>
     }
     valid = true
   }
 
-  /** Compares two value to trigger notification if the value changed. To be overridden in descendants.
+  /**
+    * Called when the value is going to change. Assigns new value, trigger the notification
+    *
+    * @param newValue new value
+    */
+  protected def onValueChange(newValue: T): Unit = {
+    lastValue = newValue
+    notifyConsumers()
+  }
+
+  /**
+    * Compares two values to decide if the value changed.
     *
     * @param newValue  new calculated value
     * @param lastValue previous know value
@@ -103,11 +120,12 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     */
   protected def isDifferent(newValue: T, lastValue: T): Boolean = newValue != lastValue
 
-  /** Unsubscribe from all producers and keep last value, so no new recalculation of the value will occur.
+  /**
+    * Unsubscribe from all producers and keep last value, so no new recalculation of the value will occur.
     */
   @inline def unbind(): Unit = :=(value)
 
-  override protected[react] def producerChanged(p: Producer[_]): Unit = calculator.reCalc(this)
+  override protected[react] def producerChanged(p: Producer[_]): Unit = calculator.needReCalc(this)
 
   override def toString: String = value.toString
 
@@ -116,8 +134,10 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
   }
 }
 
-/** Implicit conversions and syntax sugar object for [[Reactive Reactive]] class.
-  * Use [[Reactive#>>(scala.Function1) >>]] to spawn new Reactive[T] objects. */
+/**
+  * Implicit conversions and syntax sugar object for [[Reactive Reactive]] class.
+  * Use [[Reactive#>>(scala.Function1) >>]] to spawn new Reactive[T] objects.
+  */
 //noinspection LanguageFeature
 object Reactive {
   /**

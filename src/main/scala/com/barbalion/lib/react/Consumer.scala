@@ -19,7 +19,7 @@ trait Consumer {
   protected[react] def consume(ps: TraversableOnce[Producer[_]]): Unit = producers.synchronized({
     ps.foreach((p) => {
       p.subscribe(this)
-      producers(p) = p
+      producers(p) = true
     })
   })
 

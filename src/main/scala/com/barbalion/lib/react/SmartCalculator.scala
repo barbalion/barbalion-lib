@@ -10,9 +10,9 @@ class SmartCalculator extends Calculator with QueuedCalculator {
 
   override def valueSet(r: Reactive[_]): Unit = r.invalidate()
 
-  override def firstUse(r: Reactive[_]): Unit = {
+  override def valueFirstRead(r: Reactive[_]): Unit = {
     if (calcStack.contains(r)) {
-      queue += r
+      enqueue(r)
     } else {
       calcStack += r
       try {
@@ -23,9 +23,7 @@ class SmartCalculator extends Calculator with QueuedCalculator {
     }
   }
 
-  override def reCalc(r: Reactive[_]): Unit = r.invalidate()
+  override def needReCalc(r: Reactive[_]): Unit = r.invalidate()
 
-  override protected def continueQueue(queue: TraversableOnce[Reactive[_]]): Unit = queue foreach reCalc
+  override protected def continueQueue(queue: TraversableOnce[Reactive[_]]): Unit = queue foreach needReCalc
 }
-
-object SmartCalculator extends SmartCalculator

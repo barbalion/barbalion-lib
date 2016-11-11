@@ -59,6 +59,8 @@ case class DoubleE(
 
   def +(a: Double) = newResultValue(value + a, fixedErr2)
 
+  def isGoodNumber = !value.isInfinity && !value.isNaN
+
   protected lazy val fixedErr2 = {
     val minErr2 = value * value * DoubleE.DOUBLE_ERROR2
     if (err2.isNaN || err2 < minErr2) minErr2 else err2
@@ -131,16 +133,16 @@ case class DoubleE(
 }
 
 object DoubleE {
-  def weightedMean(values: List[DoubleE]) = {
+  def weightedMean(values: Traversable[DoubleE]): DoubleE = {
     values.filter(_.fixedErr2 == 0) match {
-      case Nil => // weighted mean
+      case empty if empty.isEmpty => // weighted mean
         values.map(x => x / x.fixedErr2).sum(Zero) / values.map(1 / _.fixedErr2).sum
       case exactValues => // simple mean of value with zero error (ignore values with error)
         exactMean(exactValues)
     }
   }
 
-  def exactMean(values: List[DoubleE]): DoubleE = {
+  def exactMean(values: Traversable[DoubleE]): DoubleE = {
     def sqr(x: Double) = x * x
 
     val count = if (values.nonEmpty) values.size else 1
