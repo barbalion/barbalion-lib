@@ -125,7 +125,7 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     */
   @inline def unbind(): Unit = :=(value)
 
-  override protected[react] def producerChanged(p: Producer[_]): Unit = calculator.needReCalc(this)
+  override protected[react] def onProducerChange(p: Producer[_]): Unit = calculator.needReCalc(this)
 
   override def toString: String = value.toString
 

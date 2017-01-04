@@ -26,7 +26,7 @@ trait Producer[T] {
     * @param c Consumer to notify
     * @return true if consumer wasn't subscribed yet
     */
-  protected[react] def subscribe(c: Consumer): Unit = consumers.synchronized(consumers.add(c))
+  def subscribe(c: Consumer): Unit = consumers.synchronized(consumers.add(c))
 
   /**
     * Subscribes a simple one-time call-back
@@ -35,8 +35,8 @@ trait Producer[T] {
     * @param oneTime if true then the callback will be called only once
     * @return true if consumer wasn't subscribed yet
     */
-  protected[react] def subscribe(c: => Unit, oneTime: Boolean = false): Unit = subscribe(new Consumer {
-    override protected[react] def producerChanged(p: Producer[_]): Unit = {
+  def subscribe(c: => Unit, oneTime: Boolean = false): Unit = subscribe(new Consumer {
+    override protected[react] def onProducerChange(p: Producer[_]): Unit = {
       if (oneTime) unsubscribe(this)
       c
     }
@@ -56,6 +56,6 @@ trait Producer[T] {
     */
   protected[react] final def notifyConsumers(): Unit = doNotifyConsumers(consumers)
 
-  protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]): Unit = consumers.foreach(_.producerChanged(this))
+  protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]): Unit = consumers.foreach(_.onProducerChange(this))
 
 }

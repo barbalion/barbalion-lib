@@ -50,6 +50,6 @@ trait Consumer {
     *
     * @param p the producer which value changed
     */
-  protected[react] def producerChanged(p: Producer[_])
+  protected[react] def onProducerChange(p: Producer[_])
 
 }
