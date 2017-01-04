@@ -17,3 +17,5 @@ libraryDependencies ++= Seq(
 )
 
 isSnapshot := true
+
+exportJars := true
