@@ -26,7 +26,7 @@ trait Producer[T] {
     * @param c Consumer to notify
     * @return true if consumer wasn't subscribed yet
     */
-  def subscribe(c: Consumer): Unit = consumers.synchronized(consumers.add(c))
+  protected[react] def subscribe(c: Consumer): Unit = consumers.synchronized(consumers.add(c))
 
   /**
     * Subscribes a simple one-time call-back
