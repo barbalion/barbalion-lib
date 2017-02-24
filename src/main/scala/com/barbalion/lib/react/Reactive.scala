@@ -20,7 +20,7 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
   /**
     * The variable function that will calculate the result for us
     */
-  protected var calcFunction = func
+  protected var calcFunction: () => T = func
 
   /**
     * Cached last known value
@@ -83,7 +83,7 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
   def invalidate(): Unit = {
     if (valid) {
       valid = false
-      consumers foreach {
+      subscribers foreach {
         case r: Reactive[_] => r.invalidate()
         case _ =>
       }

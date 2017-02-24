@@ -11,7 +11,7 @@ trait Producer[T] {
   /**
     * Set of consumers
     */
-  protected val consumers = new mutable.HashSet[Consumer]
+  protected val subscribers = new mutable.HashSet[Consumer]
 
   /**
     * The produced value
@@ -26,7 +26,7 @@ trait Producer[T] {
     * @param c Consumer to notify
     * @return true if consumer wasn't subscribed yet
     */
-  protected[react] def subscribe(c: Consumer): Unit = consumers.synchronized(consumers.add(c))
+  protected[react] def subscribe(c: Consumer): Unit = subscribers.synchronized(subscribers.add(c))
 
   /**
     * Subscribes a simple one-time call-back
@@ -49,12 +49,12 @@ trait Producer[T] {
     * @param c Consumer to unsubscribe
     * @return true if consumer was subscribed
     */
-  protected[react] def unsubscribe(c: Consumer): Boolean = consumers.synchronized(consumers.remove(c))
+  protected[react] def unsubscribe(c: Consumer): Boolean = subscribers.synchronized(subscribers.remove(c))
 
   /**
     * Notify previously subscribed consumers
     */
-  protected[react] final def notifyConsumers(): Unit = doNotifyConsumers(consumers)
+  protected[react] final def notifyConsumers(): Unit = doNotifyConsumers(subscribers)
 
   protected[react] def doNotifyConsumers(consumers: mutable.HashSet[Consumer]): Unit = consumers.foreach(_.onProducerChange(this))
 
