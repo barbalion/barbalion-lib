@@ -59,7 +59,7 @@ case class DoubleE(
 
   def +(a: Double): DoubleE = newResultValue(value + a, fixedErr2)
 
-  def isGoodNumber: Boolean = !value.isInfinity && !value.isNaN
+  def isGoodNumber: Boolean = !value.isInfinity && !value.isNaN && !err2.isNaN && !err2.isInfinity
 
   protected lazy val fixedErr2: Double = {
     val minErr2 = value * value * DoubleE.DOUBLE_ERROR2
@@ -67,7 +67,8 @@ case class DoubleE(
   }
 
   protected def newResultValue(value: Double, err2: Double): DoubleE = {
-    if (value.isNaN || err2.isNaN) sys.error("NAN") else
+    if (value.isNaN || err2.isNaN)
+      sys.error("NAN") else // todo remove debug check
       new DoubleE(value, err2)
   }
 
@@ -92,7 +93,7 @@ case class DoubleE(
     newResultValue(e, fixedErr2 * e * e)
   }
 
-  def log: DoubleE = newResultValue(math.log(value), fixedErr2 / value / value)
+  def log: DoubleE = newResultValue(math.log(value), fixedErr2 / value2)
 
   def sin: DoubleE = newResultValue(math.sin(value), fixedErr2 * { val v = math.cos(value); v * v })
 
@@ -131,10 +132,18 @@ case class DoubleE(
 
   override def hashCode(): Int = value.hashCode() + err2.hashCode()
 
+  override def parseString(str: String): Option[DoubleE] = str.toDoubleOption match {
+    case Some(v) => Some(new DoubleE(v, 0))
+    case None =>
+      str.split("\\+-") match {
+        case Array(vs, es) => vs.toDoubleOption.zip(es.toDoubleOption).map({ case (v: Double, e: Double) => new DoubleE(v, e * e) })
+        case _ => None
+      }
+  }
 }
 
 object DoubleE {
-  def weightedMean(values: Traversable[DoubleE]): DoubleE = {
+  def weightedMean(values: Iterable[DoubleE]): DoubleE = {
     values.filter(_.fixedErr2 == 0) match {
       case empty if empty.isEmpty => // weighted mean
         values.map(x => x / x.fixedErr2).sum(Zero) / values.map(1 / _.fixedErr2).sum
@@ -143,7 +152,7 @@ object DoubleE {
     }
   }
 
-  def exactMean(values: Traversable[DoubleE]): DoubleE = {
+  def exactMean(values: Iterable[DoubleE]): DoubleE = {
     def sqr(x: Double) = x * x
 
     val count = if (values.nonEmpty) values.size else 1
@@ -169,11 +178,11 @@ object DoubleE {
 
   implicit def infixFractionalOps(x: DoubleE): DoubleE#FractionalOps = new x.FractionalOps(x)
 
-  val Zero = DoubleE(0, DOUBLE_ERROR2)
-  val One = DoubleE(1, DOUBLE_ERROR2)
-  val Two = DoubleE(2, 4 * DOUBLE_ERROR2)
-  val Three = DoubleE(3, 9 * DOUBLE_ERROR2)
-  val Four = DoubleE(4, 16 * DOUBLE_ERROR2)
+  val Zero: DoubleE = DoubleE(0, DOUBLE_ERROR2)
+  val One: DoubleE = DoubleE(1, DOUBLE_ERROR2)
+  val Two: DoubleE = DoubleE(2, 4 * DOUBLE_ERROR2)
+  val Three: DoubleE = DoubleE(3, 9 * DOUBLE_ERROR2)
+  val Four: DoubleE = DoubleE(4, 16 * DOUBLE_ERROR2)
 
   /* here comes NaN implementation */
   object NaN extends DoubleE(Double.NaN, Double.NaN) {

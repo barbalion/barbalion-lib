@@ -2,10 +2,10 @@ package com.barbalion.lib.math.test
 
 import com.barbalion.lib.math.DoubleE
 import com.barbalion.lib.math.DoubleE._
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-class DoubleESpec extends FlatSpec {
+class DoubleESpec extends AnyFlatSpec {
   {
     Zero.value == 0 && Zero.err != 0 && Zero == new DoubleE(0, 0) should be(true)
 
@@ -29,12 +29,12 @@ class DoubleESpec extends FlatSpec {
     x.err shouldBe 2
     x.err2 shouldBe 4
 
-    "error2 of sum" must "be equal sum of error2s" in {
+    "error2 of sum" should "be equal sum of error2s" in {
       assert((x + y).err2 == 13)
       assert((x + Err(6)).err2 == 10)
     }
 
-    "Fixed error2 with double error" must "be checked" in {
+    "Fixed error2 with double error" should "be checked" in {
       assert((One + Two + Zero).err2 > One.err2 + Two.err2)
       assert((One - Two + Zero).err2 > One.err2 + Two.err2)
     }

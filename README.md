@@ -1,2 +1,2 @@
 # barbalion-lib
-Common Library of Barbalion
+Common Library of/by Barbalion
