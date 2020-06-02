@@ -1,16 +1,16 @@
 package com.barbalion.lib.math.test
 
-import com.barbalion.lib.math.{DoubleE, Vector2E, VectorE}
-import org.scalatest.FlatSpec
+import com.barbalion.lib.math.{DoubleE, Vector2E}
+import org.scalatest.flatspec.AnyFlatSpec
 
-class VectorESpec extends FlatSpec {
+class VectorESpec extends AnyFlatSpec {
   "Vector combination" must "calculate" in {
     val v1 = Vector2E(1, 2)
     val v2 = Vector2E(3, 4)
-    assert((v1+v2).x.value == 4)
-    assert((v1+v2).y.value == 6)
-    assert((v1-v2).x.value == -2)
-    assert((v1-v2).y.value == -2)
+    assert((v1 + v2).x.value == 4)
+    assert((v1 + v2).y.value == 6)
+    assert((v1 - v2).x.value == -2)
+    assert((v1 - v2).y.value == -2)
   }
 
   "Vector reverse" must "calculate" in {

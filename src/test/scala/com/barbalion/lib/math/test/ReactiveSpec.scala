@@ -1,11 +1,13 @@
 package com.barbalion.lib.math.test
 
 import com.barbalion.lib.react._
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class ReactiveSpec extends FlatSpec with Matchers {
+//noinspection ScalaStyle
+class ReactiveSpec extends AnyFlatSpec with Matchers {
   {
-    implicit val calculator = InstantCalculator
+    implicit val calculator: InstantCalculator.type = InstantCalculator
     val x = Reactive(1.5)
     "Static reactive value " must " keep its value" in {
       x.value.should(be(1.5))
@@ -13,7 +15,7 @@ class ReactiveSpec extends FlatSpec with Matchers {
       x.value should be(0)
     }
 
-    val y = x >> ((x) => x + 1)
+    val y = x >> (_ + 1)
     "Dependent reactive value" must " calc init value" in {
       y.value should be(1)
     }
@@ -51,7 +53,7 @@ class ReactiveSpec extends FlatSpec with Matchers {
     }
 
     "Sequence " must " compile" in {
-      val seq = Seq(Reactive(1), Reactive(2), Reactive(3)) >> (seq => seq.sum)
+      val seq = Seq(Reactive(1), Reactive(2), Reactive(3)) >> (seq => seq.iterator.sum)
       seq.value should be(6)
     }
 
@@ -65,22 +67,22 @@ class ReactiveSpec extends FlatSpec with Matchers {
   }
 
   {
-    implicit val smartCalculator = new SmartCalculator
+    implicit val smartCalculator: SmartCalculator = new SmartCalculator
 
     "SmartCalculator" must "calculate circular dependencies" in {
       val c1 = Reactive(0)
       val c2 = Reactive(0)
       smartCalculator.done should be(true)
-      c2 := c1 >> (c1 => c1 + 1)
-      c1 := c2 >> (c2 => c2 + 1)
-//      smartCalculator.done should be(false)  // todo do we need to check 'done' here?
+      c2 := c1 >> (_ + 1)
+      c1 := c2 >> (_ + 1)
+      //      smartCalculator.done should be(false)  // todo do we need to check 'done' here?
       c1.value should be(2)
       c2.value should be(3)
-//      smartCalculator.done should be(false)
-//      smartCalculator.continue()
+      //      smartCalculator.done should be(false)
+      //      smartCalculator.continue()
       c1.value should be(4)
       c2.value should be(5)
-//      smartCalculator.done should be(false)
+      //      smartCalculator.done should be(false)
     }
 
     "WaveCalculator" must "calculate circular dependencies" in {
@@ -89,8 +91,8 @@ class ReactiveSpec extends FlatSpec with Matchers {
       wc.done should be(true)
       val c1 = Reactive(0)(wc)
       val c2 = Reactive(0)(wc)
-      c2 := c1 >> (c1 => c1 + 1)
-      c1 := c2 >> (c2 => c2 + 1)
+      c2 := c1 >> (_ + 1)
+      c1 := c2 >> (_ + 1)
       wc.continue()
       c1.value should be(2)
       c2.value should be(3)

@@ -2,31 +2,34 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80e82903-f31d-47bc-bf63-08488b6e115b" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scala_lang_modules_scala_xml_2_13_1_2_0_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scala_lang_scala_library_2_13_1_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scala_lang_scala_reflect_2_13_1_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalactic_scalactic_2_13_3_1_0_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_2_13_3_1_0_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_compatible_3_1_0_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SBT__io_reactivex_rxjava_1_1_1_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SBT__io_reactivex_rxscala_2_11_0_26_1_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_modules_scala_xml_2_11_1_0_2_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_library_2_11_8_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_reflect_2_11_5_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scalactic_scalactic_2_11_2_3_0_SNAP2_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scalatest_scalatest_2_11_2_3_0_SNAP2_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalactic_scalactic_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_compatible_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_core_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_diagrams_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_featurespec_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_flatspec_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_freespec_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_funspec_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_funsuite_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_matchers_core_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_mustmatchers_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_propspec_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_refspec_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_shouldmatchers_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_wordspec_2_13_3_3_0_SNAP2_jar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalactic_scalactic_2_13_3_1_0_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_2_13_3_1_0_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalatest_scalatest_compatible_3_1_0_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/scala_sdk_2_11_8.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/barbalion-lib-build.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/barbalion-lib-build.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/barbalion-lib.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/barbalion-lib.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sbt.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sbt.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/barbalion/lib/math/DoubleE.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/barbalion/lib/math/DoubleE.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/scala/com/barbalion/lib/math/test/DoubleESpec.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/com/barbalion/lib/math/test/DoubleESpec.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/scala/com/barbalion/lib/math/test/ReactiveSpec.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/com/barbalion/lib/math/test/ReactiveSpec.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/scala/com/barbalion/lib/math/test/VectorESpec.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/com/barbalion/lib/math/test/VectorESpec.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,20 +78,16 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="KonanWorkspace">
+    <executables />
+  </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="1" />
-  </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1034" />
   </component>
   <component name="ProjectId" id="1XoCO2OyIfrKsRwHUjPfg1Accxj" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
@@ -110,11 +109,10 @@
     <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15625" />
     <property name="project.structure.side.proportion" value="0.2958293" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Scala" />
-    <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="device.file.explorer" />
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
@@ -295,7 +293,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
       <option name="filePath" />
       <option name="vmParameters" />
       <option name="alternativeJrePath" />
@@ -358,6 +356,7 @@
       <option name="javaOptions" value="" />
       <option name="jrePath" />
       <option name="searchTest" value="In single module" />
+      <option name="shortenClasspath" />
       <option name="showProgressMessages" value="true" />
       <option name="testArgs" value="" />
       <option name="testPackagePath" value="com.barbalion" />
@@ -366,6 +365,7 @@
       <option name="workingDirectory" value="C:\Job\open\barbalion-lib" />
       <method v="2">
         <option name="Make" enabled="true" />
+        <option name="BSP.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="TestNG">
@@ -396,40 +396,6 @@
       <method v="2" />
     </configuration>
   </component>
-  <component name="SbtLocalSettings">
-    <option name="availableProjects">
-      <map>
-        <entry>
-          <key>
-            <ExternalProjectPojo>
-              <option name="name" value="barbalion-lib" />
-              <option name="path" value="$PROJECT_DIR$" />
-            </ExternalProjectPojo>
-          </key>
-          <value>
-            <list>
-              <ExternalProjectPojo>
-                <option name="name" value="barbalion-lib [file:/C:/Job/open/barbalion-lib/]" />
-                <option name="path" value="$PROJECT_DIR$" />
-              </ExternalProjectPojo>
-              <ExternalProjectPojo>
-                <option name="name" value="barbalion-lib-build" />
-                <option name="path" value="$PROJECT_DIR$/project" />
-              </ExternalProjectPojo>
-            </list>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="modificationStamps">
-      <map>
-        <entry key="$PROJECT_DIR$/../../IndoorScout/Client/Android" value="1455436044061" />
-        <entry key="$PROJECT_DIR$/build.sbt" value="2852134619" />
-        <entry key="$PROJECT_DIR$/project/build.properties" value="882899147" />
-        <entry key="$PROJECT_DIR$/project/plugins.sbt" value="0" />
-      </map>
-    </option>
-  </component>
   <component name="ScalaProjectSettings">
     <option name="dontShowConversionDialog" value="true" />
   </component>
@@ -453,44 +419,18 @@
       <workItem from="1470405052713" duration="4537000" />
       <workItem from="1470518375340" duration="4590000" />
       <workItem from="1471040144686" duration="7033000" />
-      <workItem from="1581703027172" duration="177000" />
+      <workItem from="1581703027172" duration="613000" />
+      <workItem from="1584620165200" duration="143000" />
+      <workItem from="1584628242217" duration="109000" />
+      <workItem from="1584628679994" duration="32000" />
+      <workItem from="1584628961421" duration="757000" />
+      <workItem from="1586189463430" duration="972000" />
+      <workItem from="1591128747324" duration="470000" />
     </task>
     <servers />
   </component>
-  <component name="TestHistory">
-    <history-entry file="Test - 2016.08.13 at 02h 33m 02s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 02h 34m 10s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 02h 45m 55s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 02h 46m 30s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 02h 55m 55s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 03h 01m 47s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 03h 02m 31s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 03h 09m 44s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 03h 11m 55s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Test - 2016.08.13 at 03h 13m 03s.xml">
-      <configuration name="Test" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="2" />
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -501,12 +441,70 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="440" y="145" key="SettingsEditor" timestamp="1581703078823">
+    <state x="640" y="306" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1584620300677">
       <screen x="0" y="0" width="1920" height="1138" />
     </state>
-    <state x="440" y="145" key="SettingsEditor/0.0.1920.1138/-1920.0.1920.1050@0.0.1920.1138" timestamp="1581703078823" />
+    <state x="640" y="306" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1138/-1920.0.1920.1050@0.0.1920.1138" timestamp="1584620300677" />
+    <state width="1920" height="331" key="GridCell.Tab.0.bottom" timestamp="1591129177005">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.0.bottom/0.0.1920.1018@0.0.1920.1018" timestamp="1591129177005" />
+    <state width="1920" height="331" key="GridCell.Tab.0.center" timestamp="1591129177005">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.0.center/0.0.1920.1018@0.0.1920.1018" timestamp="1591129177005" />
+    <state width="1920" height="331" key="GridCell.Tab.0.left" timestamp="1591129177005">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.0.left/0.0.1920.1018@0.0.1920.1018" timestamp="1591129177005" />
+    <state width="1920" height="331" key="GridCell.Tab.0.right" timestamp="1591129177005">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.0.right/0.0.1920.1018@0.0.1920.1018" timestamp="1591129177005" />
+    <state width="1920" height="331" key="GridCell.Tab.1.bottom" timestamp="1591129178076">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.1.bottom/0.0.1920.1018@0.0.1920.1018" timestamp="1591129178076" />
+    <state width="1920" height="331" key="GridCell.Tab.1.center" timestamp="1591129178076">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.1.center/0.0.1920.1018@0.0.1920.1018" timestamp="1591129178076" />
+    <state width="1920" height="331" key="GridCell.Tab.1.left" timestamp="1591129178076">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.1.left/0.0.1920.1018@0.0.1920.1018" timestamp="1591129178076" />
+    <state width="1920" height="331" key="GridCell.Tab.1.right" timestamp="1591129178076">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state width="1920" height="331" key="GridCell.Tab.1.right/0.0.1920.1018@0.0.1920.1018" timestamp="1591129178076" />
+    <state x="440" y="130" key="SettingsEditor" timestamp="1591129039742">
+      <screen x="0" y="0" width="1920" height="1018" />
+    </state>
+    <state x="440" y="130" key="SettingsEditor/0.0.1920.1018@0.0.1920.1018" timestamp="1591129039742" />
+    <state x="440" y="145" key="SettingsEditor/0.0.1920.1138/-1920.0.1920.1050@0.0.1920.1138" timestamp="1586190322284" />
+    <state x="92" y="92" width="1736" height="954" key="com.android.tools.idea.avdmanager.AvdListDialog" timestamp="1586189531965">
+      <screen x="0" y="0" width="1920" height="1138" />
+    </state>
+    <state x="92" y="92" width="1736" height="954" key="com.android.tools.idea.avdmanager.AvdListDialog/0.0.1920.1138/-1920.0.1920.1050@0.0.1920.1138" timestamp="1586189531965" />
+    <state x="667" y="395" key="com.intellij.ide.util.TipDialog" timestamp="1586189476432">
+      <screen x="0" y="0" width="1920" height="1138" />
+    </state>
+    <state x="667" y="395" key="com.intellij.ide.util.TipDialog/0.0.1920.1138/-1920.0.1920.1050@0.0.1920.1138" timestamp="1586189476432" />
+    <state x="623" y="249" width="672" height="678" key="search.everywhere.popup" timestamp="1586190318733">
+      <screen x="0" y="0" width="1920" height="1138" />
+    </state>
+    <state x="623" y="249" width="672" height="678" key="search.everywhere.popup/0.0.1920.1138/-1920.0.1920.1050@0.0.1920.1138" timestamp="1586190318733" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/test/scala/com/barbalion/lib/math/test/DoubleESpec.scala</url>
+          <line>56</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="ScalaTestRunConfiguration">
         <watch expression="calculator.done" language="Scala" />

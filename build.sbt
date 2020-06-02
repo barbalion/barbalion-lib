@@ -11,12 +11,8 @@ organizationHomepage := Some(new URL("http://barbalion.com"))
 scalaVersion := "2.13.1"
 
 libraryDependencies ++= Seq(
-//  "org.scaloid" %% "scaloid" % "latest.release" withSources() withJavadoc(),
-//  "io.reactivex" %% "rxscala" % "latest.release" withSources() withJavadoc(),
-  "org.scalatest" %% "scalatest" % "3.1.0" % "test" withSources() withJavadoc()
+  "org.scalatest" %% "scalatest" % "latest.release" % "test" withSources() withJavadoc()
 )
-
-//resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
 isSnapshot := true
 

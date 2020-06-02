@@ -5,6 +5,7 @@ import com.barbalion.lib.math.DoubleE._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
+//noinspection ScalaStyle
 class DoubleESpec extends AnyFlatSpec {
   {
     Zero.value == 0 && Zero.err != 0 && Zero == new DoubleE(0, 0) should be(true)
@@ -53,6 +54,8 @@ class DoubleESpec extends AnyFlatSpec {
       val v1 = DoubleE(1, 0.1 * 0.1)
       val v2 = DoubleE(2, 1)
       val m1: DoubleE = weightedMean(v1 :: v2 :: Nil)
+      m1 > DoubleE(1, 0) shouldBe true
+      m1 < DoubleE(2, 0) shouldBe true
       val randomValues = (1 to 10000) map (_ => DoubleE(math.random, math.random / 10))
       weightedMean(randomValues.toList).err2 should be <= randomValues.map(_.err2).min
     }

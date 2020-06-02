@@ -13,7 +13,7 @@
         </option>
         <option name="resolveJavadocs" value="true" />
         <option name="resolveSbtClassifiers" value="true" />
-        <option name="sbtVersion" value="1.3.5" />
+        <option name="sbtVersion" value="1.3.6" />
       </SbtProjectSettings>
     </option>
   </component>
