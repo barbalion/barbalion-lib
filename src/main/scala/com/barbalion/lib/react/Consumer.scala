@@ -16,8 +16,8 @@ trait Consumer {
     *
     * @param ps producers to subscribe
     */
-  protected[react] def consume(ps: TraversableOnce[Producer[_]]): Unit = producers.synchronized({
-    ps.foreach((p) => {
+  protected[react] def consume(ps: IterableOnce[Producer[_]]): Unit = producers.synchronized({
+    ps.iterator.foreach(p => {
       p.subscribe(this)
       producers(p) = true
     })
@@ -50,6 +50,6 @@ trait Consumer {
     *
     * @param p the producer which value changed
     */
-  protected[react] def onProducerChange(p: Producer[_])
+  protected[react] def onProducerChange(p: Producer[_]): Unit
 
 }

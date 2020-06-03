@@ -143,21 +143,21 @@ case class DoubleE(
 }
 
 object DoubleE {
-  def weightedMean(values: Iterable[DoubleE]): DoubleE = {
-    values.filter(_.fixedErr2 == 0) match {
+  def weightedMean(values: IterableOnce[DoubleE]): DoubleE = {
+    values.iterator.filter(_.fixedErr2 == 0) match {
       case empty if empty.isEmpty => // weighted mean
-        values.map(x => x / x.fixedErr2).sum(Zero) / values.map(1 / _.fixedErr2).sum
+        values.iterator.map(x => x / x.fixedErr2).sum(Zero) / values.iterator.map(1 / _.fixedErr2).sum
       case exactValues => // simple mean of value with zero error (ignore values with error)
         exactMean(exactValues)
     }
   }
 
-  def exactMean(values: Iterable[DoubleE]): DoubleE = {
+  def exactMean(values: IterableOnce[DoubleE]): DoubleE = {
     def sqr(x: Double) = x * x
 
-    val count = if (values.nonEmpty) values.size else 1
-    val exactMean = (values map (_.value)).sum / count
-    val meanError2 = values.map(x => sqr(x.value - exactMean)).sum / count
+    val count = if (values.iterator.nonEmpty) values.iterator.size else 1
+    val exactMean = values.iterator.map(_.value).sum / count
+    val meanError2 = values.iterator.map(x => sqr(x.value - exactMean)).sum / count
     DoubleE(exactMean, meanError2)
   }
 

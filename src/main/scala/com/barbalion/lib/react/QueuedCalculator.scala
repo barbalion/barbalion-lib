@@ -11,6 +11,7 @@ trait QueuedCalculator extends Calculator {
 
   /**
     * Continues calculation if it wasn't [[done]].
+    *
     * @return number of cells recalculated
     */
   def continue(): Int = {
@@ -22,24 +23,27 @@ trait QueuedCalculator extends Calculator {
 
   /**
     * Add item to the queue for future calculation
+    *
     * @param r the item to enqueue
     * @return <code>true</code> if the element wasn't in the queue yet
     */
-  def enqueue(r: Reactive[_]) = queue.put(r, true).isEmpty
+  def enqueue(r: Reactive[_]): Boolean = queue.put(r, true).isEmpty
 
-  protected def continueQueue(queue: TraversableOnce[Reactive[_]]): Unit
+  protected def continueQueue(queue: IterableOnce[Reactive[_]]): Unit
 
   /**
     * Check if the calculation was completed (no circular dependencies found).
+    *
     * @return true if calculation queue is empty
     */
-  def done = queue.isEmpty
+  def done: Boolean = queue.isEmpty
 
   /**
     * The queue length of the calculator
+    *
     * @return
     */
-  def pending = queue.size
+  def pending: Int = queue.size
 
-  def clearQueue() = synchronized { queue.clear() }
+  def clearQueue(): Unit = synchronized { queue.clear() }
 }

@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/barbalion-lib.iml" filepath="$PROJECT_DIR$/.idea/modules/barbalion-lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/barbalion-lib-build.iml" filepath="$PROJECT_DIR$/.idea/modules/barbalion-lib-build.iml" />
     </modules>
   </component>
 </project>

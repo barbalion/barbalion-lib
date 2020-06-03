@@ -11,6 +11,7 @@ organizationHomepage := Some(new URL("http://barbalion.com"))
 scalaVersion := "2.13.1"
 
 libraryDependencies ++= Seq(
+  "org.typelevel" %% "cats-core" % "latest.release",
   "org.scalatest" %% "scalatest" % "latest.release" % "test" withSources() withJavadoc()
 )
 

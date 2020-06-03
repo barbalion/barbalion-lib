@@ -31,16 +31,16 @@ trait Producer[T] {
   /**
     * Subscribes a simple one-time call-back
     *
-    * @param c Consumer to notify
+    * @param c       Consumer to notify
     * @param oneTime if true then the callback will be called only once
     * @return true if consumer wasn't subscribed yet
     */
+  //noinspection ConvertExpressionToSAM
   def subscribe(c: => Unit, oneTime: Boolean = false): Unit = subscribe(new Consumer {
     override protected[react] def onProducerChange(p: Producer[_]): Unit = {
       if (oneTime) unsubscribe(this)
       c
     }
-
   })
 
   /**

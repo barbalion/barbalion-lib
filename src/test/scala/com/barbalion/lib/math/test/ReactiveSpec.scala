@@ -3,6 +3,7 @@ package com.barbalion.lib.math.test
 import com.barbalion.lib.react._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import cats.implicits._
 
 //noinspection ScalaStyle
 class ReactiveSpec extends AnyFlatSpec with Matchers {
@@ -104,5 +105,11 @@ class ReactiveSpec extends AnyFlatSpec with Matchers {
       c2.value should be(5)
       wc.done should be(false)
     }
+
+    val x = Reactive(1)
+    val y = Reactive(2)
+    (x, y).mapN(_+_)
   }
+
+
 }

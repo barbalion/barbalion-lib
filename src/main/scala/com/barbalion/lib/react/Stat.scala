@@ -1,6 +1,7 @@
 package com.barbalion.lib.react
 
 trait Stat extends LazyCalculator {
+
   object stat {
     var totalSet = 0
     var totalFirstRead = 0

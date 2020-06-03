@@ -6,7 +6,7 @@ import scala.collection.mutable
   * Smart calculator to process circular dependencies (with some overhead and synchronization).
   */
 class SmartCalculator extends Calculator with QueuedCalculator {
-  protected val calcStack = mutable.Set[Reactive[_]]()
+  protected val calcStack: mutable.Set[Reactive[_]] = mutable.Set[Reactive[_]]()
 
   override def valueSet(r: Reactive[_]): Unit = r.invalidate()
 
@@ -25,5 +25,5 @@ class SmartCalculator extends Calculator with QueuedCalculator {
 
   override def needReCalc(r: Reactive[_]): Unit = r.invalidate()
 
-  override protected def continueQueue(queue: TraversableOnce[Reactive[_]]): Unit = queue foreach needReCalc
+  override protected def continueQueue(queue: IterableOnce[Reactive[_]]): Unit = queue.iterator foreach needReCalc
 }

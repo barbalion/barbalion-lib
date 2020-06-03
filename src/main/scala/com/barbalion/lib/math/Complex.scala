@@ -10,34 +10,34 @@ case class Complex(re: Double, im: Double) extends Ordered[Complex] {
   def this(re: Double) = this(re, 0)
 
   // Unary operators
-  def unary_+ = this
+  def unary_+ : Complex = this
 
   def unary_- = new Complex(-re, -im)
 
   def unary_~ = new Complex(re, -im)
 
   // conjugate
-  def unary_! = modulus
+  def unary_! : Double = modulus
 
   // Comparison
-  def compare(that: Complex) = !this compare !that
+  def compare(that: Complex): Int = !this compare !that
 
   // Arithmetic operations
   def +(c: Complex) = new Complex(re + c.re, im + c.im)
 
-  def -(c: Complex) = this + -c
+  def -(c: Complex): Complex = this + -c
 
   def *(c: Complex) =
     new Complex(re * c.re - im * c.im, im * c.re + re * c.im)
 
-  def /(c: Complex) = {
+  def /(c: Complex): Complex = {
     require(c.re != 0 || c.im != 0)
     val d = pow(c.re, 2) + pow(c.im, 2)
     new Complex((re * c.re + im * c.im) / d, (im * c.re - re * c.im) / d)
   }
 
   // String representation
-  override def toString =
+  override def toString: String =
     this match {
       case Complex.i => "i"
       case Complex(_re, 0) => _re.toString
@@ -46,7 +46,7 @@ case class Complex(re: Double, im: Double) extends Ordered[Complex] {
     }
 
   private def asString =
-    re + (if (im < 0) "-" + -im else "+" + im) + "*i"
+    "%s%s*i".format(re, if (im < 0) "-" + -im else "+" + im)
 }
 
 //noinspection NoReturnTypeForImplicitDef
@@ -59,12 +59,12 @@ object Complex {
 
   // Implicit conversions
 
-  implicit def fromDouble(d: Double) = new Complex(d)
+  implicit def fromDouble(d: Double): Complex = new Complex(d)
 
-  implicit def fromFloat(f: Float) = new Complex(f)
+  implicit def fromFloat(f: Float): Complex = new Complex(f)
 
-  implicit def fromLong(l: Long) = new Complex(l)
+  implicit def fromLong(l: Long): Complex = new Complex(l)
 
-  implicit def fromInt(i: Int) = new Complex(i)
+  implicit def fromInt(i: Int): Complex = new Complex(i)
 }
 

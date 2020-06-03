@@ -9,7 +9,7 @@ object Tools {
 
   def length(v: (Double, Double)): Double = length(v._1, v._2)
 
-  def distance(p1: (Float, Float), p2: (Float, Float)) = length(p1._1 - p2._1, p1._2 - p2._2)
+  def distance(p1: (Float, Float), p2: (Float, Float)): Float = length(p1._1 - p2._1, p1._2 - p2._2)
 
-  def distance(p1: (Double, Double), p2: (Double, Double)) = length(p1._1 - p2._1, p1._2 - p2._2)
+  def distance(p1: (Double, Double), p2: (Double, Double)): Double = length(p1._1 - p2._1, p1._2 - p2._2)
 }

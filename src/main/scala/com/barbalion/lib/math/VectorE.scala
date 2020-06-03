@@ -19,7 +19,7 @@ abstract class VectorE[T <: VectorE[_]](val coordinates: List[DoubleE]) {
   def -(a: VectorE[T]): VectorE[T] = combineVectors(a, Zero.minus)
 
   protected def combineVectors(a: VectorE[T], op: (DoubleE, DoubleE) => DoubleE): VectorE[T] = buildInstance(
-    (coordinates, a.coordinates).zipped map op
+    (coordinates lazyZip a.coordinates) map op
   )
 
   def buildInstance(coordinates: List[DoubleE]): VectorE[T]
@@ -35,9 +35,9 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
 
   def -(a: Vector2E): Vector2E = combineVectors(a, Zero.minus).asInstanceOf[Vector2E]
 
-  def /(div: DoubleE) = Vector2E(x / div, y / div)
+  def /(div: DoubleE): Vector2E = Vector2E(x / div, y / div)
 
-  def *(div: DoubleE) = Vector2E(x * div, y * div)
+  def *(div: DoubleE): Vector2E = Vector2E(x * div, y * div)
 
   def ==(a: Vector2E): Boolean = x.value == a.x.value && y.value == a.y.value
 
@@ -52,7 +52,7 @@ case class Vector2E(x: DoubleE, y: DoubleE) extends VectorE(List(x, y)) {
 
   def posFloat: (Float, Float) = (x.value.toFloat, y.value.toFloat)
 
-  def reverse = Vector2E(-x, -y)
+  def reverse: Vector2E = Vector2E(-x, -y)
 
   def phi: Double = math.atan2(y.value, x.value)
 
@@ -64,12 +64,12 @@ object Vector2E {
 
   implicit def tuple2conv(v: (Double, Double)): Vector2E = Vector2E(v._1, v._2)
 
-  def weightedMean(vs: Traversable[Vector2E]): Option[Vector2E] = vs match {
-    case empty if empty.isEmpty => None
-    case _ => Some(Vector2E(DoubleE.weightedMean(vs map (_.x)), DoubleE.weightedMean(vs map (_.y))))
+  def weightedMean(vs: IterableOnce[Vector2E]): Option[Vector2E] = vs match {
+    case empty if empty.iterator.isEmpty => None
+    case _ => Some(Vector2E(DoubleE.weightedMean(vs.iterator.map(_.x)), DoubleE.weightedMean(vs.iterator.map(_.y))))
   }
 
-  val Zero = Vector2E(DoubleE.Zero, DoubleE.Zero)
+  val Zero: Vector2E = Vector2E(DoubleE.Zero, DoubleE.Zero)
 }
 
 case class Vector3E(x: DoubleE, y: DoubleE, z: DoubleE) extends VectorE(List(x, y, z)) {

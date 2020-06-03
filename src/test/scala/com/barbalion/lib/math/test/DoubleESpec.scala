@@ -57,9 +57,10 @@ class DoubleESpec extends AnyFlatSpec {
       m1 > DoubleE(1, 0) shouldBe true
       m1 < DoubleE(2, 0) shouldBe true
       val randomValues = (1 to 10000) map (_ => DoubleE(math.random, math.random / 10))
+      import Ordering.Double.TotalOrdering
       weightedMean(randomValues.toList).err2 should be <= randomValues.map(_.err2).min
     }
-
+    
     withClue("Constant cache") {
       DoubleE.fromDouble(1) should be theSameInstanceAs One
     }

@@ -1,9 +1,11 @@
 package com.barbalion.lib.react
 
+import cats.Bimonad
+
 /**
   * Reactive Cell implementation. It can store one [[Reactive#value() value]] of type <code>T</code>.
   * The value can be dependant of other cells.
-  * Use [[com.barbalion.lib.react.Reactive$ Reactive]] object to create new instances of the cells.
+  * Use [[com.barbalion.lib.react.Reactive Reactive]] object to create new instances of the cells.
   * Assign new values (constant or reactive) to <code>value</code> property.
   *
   * @tparam T the type of cell's value
@@ -12,7 +14,10 @@ package com.barbalion.lib.react
   * @param calculator [[com.barbalion.lib.react.Calculator Calculator]] to run calculations
   * @see [[Reactive#value value]] property
   */
-class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calculator) extends Producer[T] with Consumer {
+//noinspection ScalaStyle
+class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calculator)
+  extends Producer[T] with Consumer with Iterable[T] {
+
   def this(constant: T)(implicit calculator: Calculator) = this(() => constant)
 
   private var valid = true
@@ -65,7 +70,9 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
     * @tparam V type of the result
     * @return new <code>Reactive[V]</code> object
     */
-  @inline def >>[V](f: (T) => V) = new Reactive(() => f(value), this)
+  @inline def >>[V](f: T => V) = new Reactive(() => f(value), this)
+
+  override def iterator: Iterator[T] = Iterator(value)
 
   /**
     * The produced value, auto-calculated if necessary
@@ -132,14 +139,42 @@ class Reactive[T](func: () => T, ps: Producer[_]*)(implicit val calculator: Calc
   {
     consume(ps)
   }
+
 }
 
 /**
   * Implicit conversions and syntax sugar object for [[Reactive Reactive]] class.
   * Use [[Reactive#>>(scala.Function1) >>]] to spawn new Reactive[T] objects.
   */
-//noinspection LanguageFeature
+//noinspection LanguageFeature,ScalaStyle,DuplicatedCode,TypeAnnotation
 object Reactive {
+  //noinspection SpellCheckingInspection
+  implicit def bimonadForReactive[T](implicit calculator: Calculator): Bimonad[Reactive] = new Bimonad[Reactive] {
+    override def pure[A](x: A): Reactive[A] = Reactive.apply(x)
+
+    override def extract[A](x: Reactive[A]): A = x.value
+
+    override def coflatMap[A, B](fa: Reactive[A])(f: Reactive[A] => B): Reactive[B] = pure(f(fa))
+
+    override def flatMap[A, B](fa: Reactive[A])(f: A => Reactive[B]): Reactive[B] = {
+      val b = f(fa.value)
+      b.subscribe(fa)
+      b
+    }
+
+    @scala.annotation.tailrec
+    override def tailRecM[A, B](a: A)(f: A => Reactive[Either[A, B]]): Reactive[B] = {
+      val fv = f(a)
+      fv.value match {
+        case Left(a) => tailRecM(a)(f) // call itself
+        case Right(b) =>
+          val rb = pure(b)
+          rb.consume(fv)
+          rb // finish computation
+      }
+    }
+  }
+
   /**
     * Creates [[Reactive Reactive]] cell object with specified initial value.
     *
@@ -194,11 +229,11 @@ object Reactive {
 
   implicit def reactTupleConv[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22](t: (Reactive[T1], Reactive[T2], Reactive[T3], Reactive[T4], Reactive[T5], Reactive[T6], Reactive[T7], Reactive[T8], Reactive[T9], Reactive[T10], Reactive[T11], Reactive[T12], Reactive[T13], Reactive[T14], Reactive[T15], Reactive[T16], Reactive[T17], Reactive[T18], Reactive[T19], Reactive[T20], Reactive[T21], Reactive[T22]))(implicit calculator: Calculator): ReactiveTuple22[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22] = new ReactiveTuple22(t)
 
-  class ReactiveSeq[T](seq: TraversableOnce[Reactive[T]])(implicit calculator: Calculator) {
-    @inline def >>[V](f: TraversableOnce[T] => V) = new Reactive(() => f(seq map (_.value)), seq.toSeq: _*)
+  class ReactiveSeq[T](seq: IterableOnce[Reactive[T]])(implicit calculator: Calculator) {
+    @inline def >>[V](f: IterableOnce[T] => V) = new Reactive(() => f(seq.iterator.map(_.value)), seq.iterator.toSeq: _*)
   }
 
-  implicit def reactSeqConv[T](seq: TraversableOnce[Reactive[T]])(implicit calculator: Calculator): ReactiveSeq[T] = new ReactiveSeq[T](seq)
+  implicit def reactSeqConv[T](seq: IterableOnce[Reactive[T]])(implicit calculator: Calculator): ReactiveSeq[T] = new ReactiveSeq[T](seq)
 
   class ReactiveTuple2[T1, T2](t: (Reactive[T1], Reactive[T2]))(implicit calculator: Calculator) {
     @inline def >>[V](f: (T1, T2) => V) = Reactive(() => f(t._1.value, t._2.value), Seq(t._1, t._2): _*)
